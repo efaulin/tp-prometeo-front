@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
+import { UserInterface } from '../interfaces/userInterface'; 
 
 const UsersPage: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([]);
+    const [users, setUsers] = useState<UserInterface[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
   
     // Obtener usuarios al cargar la página
     useEffect(() => {
@@ -20,6 +15,7 @@ const UsersPage: React.FC = () => {
   
     const fetchUsers = async () => {
       const response = await axiosInstance.get('/usuario');
+      console.log(response);
       setUsers(response.data);
     };
   
@@ -28,12 +24,12 @@ const UsersPage: React.FC = () => {
       setShowModal(true);
     };
   
-    const handleEditUser = (user: User) => {
+    const handleEditUser = (user: UserInterface) => {
       setSelectedUser(user); // Seleccionar usuario para editar
       setShowModal(true);
     };
   
-    const handleDeleteUser = async (userId: number) => {
+    const handleDeleteUser = async (userId: string) => {
       await axiosInstance.delete(`/usuario/${userId}`);
       fetchUsers();
     };
@@ -42,7 +38,7 @@ const UsersPage: React.FC = () => {
       event.preventDefault();
       if (selectedUser) {
         // Editar usuario
-        await axiosInstance.put(`/usuario/${selectedUser.id}`, selectedUser);
+        await axiosInstance.put(`/usuario/${selectedUser._id}`, selectedUser);
       } else {
         // Añadir usuario
         await axiosInstance.post('/usuario', selectedUser);
@@ -58,7 +54,7 @@ const UsersPage: React.FC = () => {
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Nombre</th>
+              <th>Nombre de usuario</th>
               <th>Email</th>
               <th>Acciones</th>
             </tr>
@@ -66,11 +62,11 @@ const UsersPage: React.FC = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.email}>
-                <td>{user.name}</td>
+                <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>
                   <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
-                  <Button variant="danger" onClick={() => handleDeleteUser(user.id)}>Eliminar</Button>
+                  <Button variant="danger" onClick={() => handleDeleteUser(user._id)}>Eliminar</Button>
                 </td>
               </tr>
             ))}
@@ -85,11 +81,11 @@ const UsersPage: React.FC = () => {
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formName">
-                <Form.Label>Nombre</Form.Label>
+                <Form.Label>Nombre de usuario</Form.Label>
                 <Form.Control
                   type="text"
-                  value={selectedUser?.name || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value } as User)}
+                  value={selectedUser?.username || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value } as UserInterface)}
                 />
               </Form.Group>
               <Form.Group controlId="formEmail">
@@ -97,7 +93,7 @@ const UsersPage: React.FC = () => {
                 <Form.Control
                   type="email"
                   value={selectedUser?.email || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value } as User)}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)}
                 />
               </Form.Group>
               <Button variant="primary" type="submit">
