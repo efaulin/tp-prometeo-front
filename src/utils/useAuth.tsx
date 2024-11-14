@@ -19,8 +19,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
   // Llama a esta función para autenticar al usuario
-  const login = async (data: any) => {
-    setUser(data);
+  const login = async (userData: any) => {
+    setUser(userData);
   };
 
   // Llama a esta función para cerrar sesión

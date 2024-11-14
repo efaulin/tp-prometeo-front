@@ -17,12 +17,6 @@ export const LoginPage = () => {
 
   const handleLogin = async (e: any) => {
     e.preventDefault();
-    // if (username === "user" && password === "password") {
-    //   alert("Usuario logueado");
-    //   await login({ username });
-    // } else {
-    //   alert("Invalid username or password");
-    // }
     try {
       // Enviar los datos de login al backend
       const response = await axios.post("http://localhost:3005/api/auth/login", {
@@ -31,8 +25,8 @@ export const LoginPage = () => {
       });
       console.log(response);
       // Almacenar el token en el localStorage
-      localStorage.setItem("token", response.data);
-      await login({ username });
+      localStorage.setItem("token", response.data.data.token);
+      await login(response.data.data.user);
       // Redirigir al perfil o a la página protegida
       navigate("/users");
     } catch (error) {
@@ -44,7 +38,7 @@ export const LoginPage = () => {
     <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
       <div className="w-100" style={{ maxWidth: "400px" }}>
       <Form onSubmit={handleLogin}>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Group className="mb-3">
           <Form.Label>Usuario</Form.Label>
           <Form.Control 
             id="username"
@@ -54,7 +48,7 @@ export const LoginPage = () => {
             onChange={(e) => setUsername(e.target.value)}
           />
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicPassword">
+        <Form.Group className="mb-3">
           <Form.Label>Contraseña</Form.Label>
           <Form.Control 
              id="password"
