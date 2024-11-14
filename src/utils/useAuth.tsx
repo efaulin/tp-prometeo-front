@@ -21,13 +21,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   // Llama a esta función para autenticar al usuario
   const login = async (data: any) => {
     setUser(data);
-    navigate("/secret");
   };
 
   // Llama a esta función para cerrar sesión
   const logout = () => {
     setUser(null);
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   };
 
   const value = useMemo(
