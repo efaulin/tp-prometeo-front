@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 
 interface User {
   id: number;
   name: string;
   email: string;
 }
-
-axios.defaults.baseURL = 'http://localhost:3005';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -21,9 +19,7 @@ const UsersPage: React.FC = () => {
     }, []);
   
     const fetchUsers = async () => {
-      const response = await axios.get('/api/usuario');
-      console.log("Respuesta")
-      console.log(response)
+      const response = await axiosInstance.get('/usuario');
       setUsers(response.data);
     };
   
@@ -38,7 +34,7 @@ const UsersPage: React.FC = () => {
     };
   
     const handleDeleteUser = async (userId: number) => {
-      await axios.delete(`/api/usuario/${userId}`);
+      await axiosInstance.delete(`/usuario/${userId}`);
       fetchUsers();
     };
   
@@ -46,10 +42,10 @@ const UsersPage: React.FC = () => {
       event.preventDefault();
       if (selectedUser) {
         // Editar usuario
-        await axios.put(`/api/usuario/${selectedUser.id}`, selectedUser);
+        await axiosInstance.put(`/usuario/${selectedUser.id}`, selectedUser);
       } else {
         // Añadir usuario
-        await axios.post('/api/usuario', selectedUser);
+        await axiosInstance.post('/usuario', selectedUser);
       }
       setShowModal(false);
       fetchUsers();
@@ -69,7 +65,7 @@ const UsersPage: React.FC = () => {
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.id}>
+              <tr key={user.email}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
