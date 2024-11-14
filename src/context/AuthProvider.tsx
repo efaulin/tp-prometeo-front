@@ -1,51 +1,39 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+// import React, { createContext, useState, useContext, ReactNode } from 'react';
+// // Definición de los tipos
+// interface AuthContextType {
+//     token: string | null;
+//     login: (token: string) => void;
+//     logout: () => void;
+// }
+// interface AuthProviderProps {
+//     children: ReactNode;
+//   }
 
-// Definición de los tipos
-interface AuthContextType {
-    isAuthenticated: boolean;
-    login: () => void;
-    logout: () => void;
-}
+// // Crear el contexto de autenticación
+// const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Crear el contexto de autenticación
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+//   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
 
-// Proveedor de contexto de autenticación
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+//   const login = (token: string) => {
+//     setToken(token);
+//     localStorage.setItem('token', token); // Guarda el token
+//   };
 
-    useEffect(() => {
-        // Comprobar si el token existe en localStorage al cargar la aplicación
-        const token = localStorage.getItem("token");
-        if (token) {
-            setIsAuthenticated(true);
-        }
-    }, []);
+//   const logout = () => {
+//     setToken(null);
+//     localStorage.removeItem('token');
+//   };
 
-    const login = () => {
-        // Simular el token
-        const token = "fake-jwt-token";
-        localStorage.setItem("token", token);
-        setIsAuthenticated(true);
-    };
+//   return (
+//     <AuthContext.Provider value={{ token, login, logout }}>
+//       {children}
+//     </AuthContext.Provider>
+//   );
+// };
 
-    const logout = () => {
-        localStorage.removeItem("token");
-        setIsAuthenticated(false);
-    };
-
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-            {children}
-        </AuthContext.Provider>
-    );
-};
-
-// Hook para usar el contexto de autenticación
-export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error("useAuth debe usarse dentro de un AuthProvider");
-    }
-    return context;
-};
+// export const useAuth = () => {
+//   const context = useContext(AuthContext);
+//   if (!context) throw new Error("useAuth must be used within an AuthProvider");
+//   return context;
+// };
