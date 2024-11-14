@@ -16,7 +16,7 @@ function NavBar() {
         logout(); // Llama a la función de logout del contexto
         navigate('/'); // Redirige al login después de hacer logout
     };
-
+    console.log(user)
     return (
         <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
         <Container fluid>
@@ -39,6 +39,7 @@ function NavBar() {
             {user && user.username ? (
                 <div className="d-flex align-items-center gap-3">
                     <Badge className='text-nowrap' bg="primary">Bienvenido {user.username}</Badge>
+                    <Badge className='text-nowrap' bg="success">{user.role.name}</Badge>
                     <Form className="d-flex">
                         <Button variant="outline-danger" onClick={handleLogout}>logout</Button>
                     </Form>
