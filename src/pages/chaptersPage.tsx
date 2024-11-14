@@ -2,29 +2,30 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import NavBar from './Navbar';
-import { LanguageInterface } from '../interfaces/languageInterface';
-import { NarratorInterface } from '../interfaces/narratorInterface';
+import { idiomaInterface as LanguageInterface }  from '../interfaces/idiomaInterface' ;
+import { narradorInterface as NarratorInterface } from '../interfaces/narradorInterface';
 import { AuthorInterface } from '../interfaces/authorInterface';
 import { HostInterface } from '../interfaces/hostInterface';
 import { CollectionInterface } from '../interfaces/collectionInterface';
 import { ChapterInterface } from '../interfaces/chapterInterface';
 
-const UsersPage: React.FC = () => {
+const ChaptersPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [chapters, setChapters] = useState<ChapterInterface[]>([]);
     const [languages, setLanguages] = useState<LanguageInterface[]>([]);
     const [narrators, setNarrators] = useState<NarratorInterface[]>([]);
+    const [selectedNarrator, setSelectedNarrator] = useState<NarratorInterface>(null);
     const [authors, setAuthors] = useState<AuthorInterface[]>([]);
     const [hosts, setHosts] = useState<HostInterface[]>([]);
     const [collections, setCollections] = useState<CollectionInterface[]>([]);
     const [selectedChapter, setSelectedChapter] = useState<ChapterInterface>();
 
-    const handleFechaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFecha(event.target.value);
-    };
-    const handleFechaFinishChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setFechaFinish(event.target.value);
-    };
+    // const handleFechaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //   setFecha(event.target.value);
+    // };
+    // const handleFechaFinishChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //   setFechaFinish(event.target.value);
+    // };
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
@@ -38,6 +39,7 @@ const UsersPage: React.FC = () => {
   
     const fetchChapters = async () => {
       const response = await axiosInstance.get('/capitulo');
+      console.log(response);
       setChapters(response.data);
     };
 
@@ -97,46 +99,46 @@ const UsersPage: React.FC = () => {
   
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
-      console.log(selectedUser);
-      if (selectedUser!._id != "0") {
-        // Editar usuario
-        const updUser = {
-          username: selectedUser!.username,
-          password: selectedUser!.password,
-          email: selectedUser!.email,
-          role: userRole?._id,
-          suscripcions: [
-            {
-              startDate: new Date(fecha).toISOString(),
-              endDate: new Date(fechaFinish).toISOString(),
-              suscripcionId: userSuscriptions?.suscripcionId._id,
-            }
-          ],
-        }
-        console.log("updUsr: ");
-        console.log(updUser);
-        const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
-        console.log(result);
-        fetchUsers();
-      } else {
-        // Añadir usuario
-        const newUser = {
-          username: selectedUser!.username,
-          password: selectedUser!.password,
-          email: selectedUser!.email,
-          role: userRole?._id,
-          suscripcions: [
-            {
-              startDate: selectedUser!.suscripcions[0].startDate,
-              endDate: selectedUser!.suscripcions[0].endDate,
-              suscripcionId: "670c3b7ef2006065e258366c",
-            }
-          ],
-        }
-        await axiosInstance.post('/usuario', newUser);
-      }
-      setShowModal(false);
-      fetchUsers();
+      console.log(selectedChapter);
+      // if (selectedUser!._id != "0") {
+      //   // Editar usuario
+      //   const updUser = {
+      //     username: selectedUser!.username,
+      //     password: selectedUser!.password,
+      //     email: selectedUser!.email,
+      //     role: userRole?._id,
+      //     suscripcions: [
+      //       {
+      //         startDate: new Date(fecha).toISOString(),
+      //         endDate: new Date(fechaFinish).toISOString(),
+      //         suscripcionId: userSuscriptions?.suscripcionId._id,
+      //       }
+      //     ],
+      //   }
+      //   console.log("updUsr: ");
+      //   console.log(updUser);
+      //   const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
+      //   console.log(result);
+      //   fetchChapters();
+      // } else {
+      //   // Añadir usuario
+      //   const newUser = {
+      //     username: selectedUser!.username,
+      //     password: selectedUser!.password,
+      //     email: selectedUser!.email,
+      //     role: userRole?._id,
+      //     suscripcions: [
+      //       {
+      //         startDate: selectedUser!.suscripcions[0].startDate,
+      //         endDate: selectedUser!.suscripcions[0].endDate,
+      //         suscripcionId: "670c3b7ef2006065e258366c",
+      //       }
+      //     ],
+      //   }
+      //   await axiosInstance.post('/usuario', newUser);
+      // }
+      // setShowModal(false);
+      // fetchChapters();
     };
   
     return (
@@ -167,16 +169,16 @@ const UsersPage: React.FC = () => {
                 <td>{chapter.name}</td>
                 <td>{collections ? collections.find(collection => collection._id == chapter.coleccionId)?.name : "-"}</td>
                 <td>{chapter.authors.map(author => author.name).join("; ")}</td>
-                <td>{chapter.narrator.name}</td>
-                <td>{chapter.hosts.map(host => host.name).join("; ")}</td>
+                {/* <td>{chapter.narrator.name}</td> */}
+                {/* <td>{chapter.hosts.map(host => host.name).join("; ")}</td> */}
                 <td>{chapter.durationInSeconds}</td>
                 <td>{chapter.language.name}</td>
                 <td>{chapter.description}</td>
-                <td>{chapter.uploadDate.toDateString()}</td>
-                <td>{chapter.publicationDate.toDateString()}</td>
+                {/* <td>{chapter.uploadDate.toDateString()}</td>
+                <td>{chapter.publicationDate.toDateString()}</td> */}
                 <td>
-                  <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
-                  <Button variant="danger" onClick={() => handleDeleteUser(user._id)}>Eliminar</Button>
+                  <Button variant="warning" onClick={() => handleEditChapter(chapter)}>Editar</Button>{' '}
+                  <Button variant="danger" onClick={() => handleDeleteChapter(chapter._id)}>Eliminar</Button>
                 </td>
               </tr>
             ))}
@@ -186,7 +188,7 @@ const UsersPage: React.FC = () => {
         {/* Modal para añadir o editar usuario */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>{selectedUser ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+            <Modal.Title>{selectedChapter ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
@@ -195,44 +197,25 @@ const UsersPage: React.FC = () => {
                 <Form.Control
                   required
                   type="text"
-                  value={selectedUser?.username || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value } as UserInterface)}
+                  value={selectedChapter?.name || ''}
+                  onChange={(e) => setSelectedChapter({ ...selectedChapter, username: e.target.value } as ChapterInterface)}
                 />
               </Form.Group>
-              <Form.Group controlId="formPass">
-                <Form.Label>Contraseña</Form.Label>
-                <Form.Control
-                  required
-                  type="password"
-                  value={selectedUser?.password || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, password: e.target.value } as UserInterface)}
-                />
-              </Form.Group>
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  required
-                  type="email"
-                  value={selectedUser?.email || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)}
-                />
-              </Form.Group>
+              
+             
               <Form.Group controlId="formRole">
                 <Form.Label>Tipo de usuario</Form.Label>
-                <Form.Select aria-label="Seleccione rol del usuario" value={userRole ? userRole._id : ""} required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
-                  <option value="673124570945b0b475fe07c8">admin</option>
-                  <option value="67327c62f40be4d6fc0933ae">client</option>
+                <Form.Select aria-label="Seleccione Narrador" value={selectedNarrator ? selectedNarrator._id : ""} required onChange={(e) => setSelectedNarrator({ ...setSelectedNarrator, _id: e.target.value } as NarratorInterface)}>
+                  {
+                    narrators.map((narrador)=>{
+                      return `<option value="${narrador._id}">${narrador.name}</option>`
+                    })
+                  }
                 </Form.Select>
               </Form.Group>
-              <br/>
-              <Form.Group controlId="formSuscripcionId">
-                <Form.Label>Suscripcion inicial</Form.Label>
-                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions ? userSuscriptions.suscripcionId._id : ""} required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
-                {suscriptions.map((scp) => (
-                  <option value={scp._id}>{scp.type}</option>
-                ))}
-                </Form.Select>
-              </Form.Group>
+
+
+{/*               
               <Form.Group controlId="formStartDate">
                 <Form.Label>Fecha inico</Form.Label>
                 <Row>
@@ -260,10 +243,10 @@ const UsersPage: React.FC = () => {
                       />
                   </label>
                 </Row>
-              </Form.Group>
+              </Form.Group> */}
               <br/>
               <Button variant="primary" type="submit">
-                {selectedUser ? 'Guardar cambios' : 'Agregar'}
+                {selectedChapter ? 'Guardar cambios' : 'Agregar'}
               </Button>
             </Form>
           </Modal.Body>
@@ -272,4 +255,4 @@ const UsersPage: React.FC = () => {
     );
   };
   
-  export default UsersPage;
+  export default ChaptersPage;

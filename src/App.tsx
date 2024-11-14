@@ -7,6 +7,7 @@ import { AuthProvider } from "./utils/useAuth";
 import UsersPage from "./pages/UsersPage";
 import IdiomaPage from "./pages/IdiomaPage";
 import NarradorPage from "./pages/NarradorPage";
+import ChaptersPage from "./pages/chaptersPage";
 
 function App() {
   return (
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <NarradorPage />
+            </ProtectedRoute>
+          }
+        />,
+        <Route
+          path="/chapters"
+          element={
+            <ProtectedRoute>
+              <ChaptersPage />
             </ProtectedRoute>
           }
         />
