@@ -4,13 +4,15 @@ import axiosInstance from '../utils/axiosInstance';
 import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
 import { RoleInterface } from '../interfaces/roleInterface';
 import NavBar from './Navbar';
+import { SuscriptionInterface } from '../interfaces/suscriptionInterface';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<UserInterface[]>([]);
+    const [suscriptions, setSuscriptions] = useState<SuscriptionInterface[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
     const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
-    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface[] | null>(null);
+    const [userSuscriptions, setSelectedUserSuscriptions] = useState<{suscripcionId:string, startDate:Date, endDate:Date}[] | null>([]);
   
     // Obtener usuarios al cargar la página
     useEffect(() => {
@@ -21,8 +23,14 @@ const UsersPage: React.FC = () => {
       const response = await axiosInstance.get('/usuario');
       setUsers(response.data);
     };
+
+    const fetchSuscriptions = async () => {
+      const response = await axiosInstance.get('/suscripcion');
+      setSuscriptions(response.data);
+    };
   
     const handleAddUser = () => {
+      if (!suscriptions) fetchSuscriptions();
       setSelectedUser({
         _id: "0",
         username: "",
@@ -30,14 +38,14 @@ const UsersPage: React.FC = () => {
         role: users[0].role,
         suscripcions: users[0].suscripcions,
       } as UserInterface); // Limpiar selección para añadir
-      setSelectedUserSuscriptions(users[0].suscripcions);
       setShowModal(true);
     };
   
     const handleEditUser = (user: UserInterface) => {
+      if (!suscriptions) fetchSuscriptions();
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
-      setSelectedUserSuscriptions(user.suscripcions);
+      setSelectedUserSuscriptions(user.suscripcions.map((suscp) => ({suscripcionId:suscp.suscripcionId.toString(), startDate:suscp.startDate, endDate:suscp.endDate})) as {suscripcionId:string, startDate:Date, endDate:Date}[]);
       setShowModal(true);
     };
   
@@ -51,14 +59,11 @@ const UsersPage: React.FC = () => {
       console.log(selectedUser);
       if (selectedUser!._id != "0") {
         // Editar usuario
-        await axiosInstance.put(`/usuario/${selectedUser!._id}`, selectedUser);
-      } else {
-        // Añadir usuario
-        await axiosInstance.post('/usuario', {
+        const updUser = {
           username: selectedUser!.username,
           password: selectedUser!.password,
           email: selectedUser!.email,
-          role: selectedUser!.role._id,
+          role: userRole?._id,
           suscripcions: [
             {
               startDate: selectedUser!.suscripcions[0].startDate,
@@ -66,7 +71,24 @@ const UsersPage: React.FC = () => {
               suscripcionId: "670c3b7ef2006065e258366c",
             }
           ],
-        });
+        }
+        await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
+      } else {
+        // Añadir usuario
+        const newUser = {
+          username: selectedUser!.username,
+          password: selectedUser!.password,
+          email: selectedUser!.email,
+          role: userRole?._id,
+          suscripcions: [
+            {
+              startDate: selectedUser!.suscripcions[0].startDate,
+              endDate: selectedUser!.suscripcions[0].endDate,
+              suscripcionId: "670c3b7ef2006065e258366c",
+            }
+          ],
+        }
+        await axiosInstance.post('/usuario', newUser);
       }
       setShowModal(false);
       fetchUsers();
@@ -138,6 +160,14 @@ const UsersPage: React.FC = () => {
                 <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
                   <option value="673124570945b0b475fe07c8">admin</option>
                   <option value="67327c62f40be4d6fc0933ae">client</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group controlId="formSuscripcionId">
+                <Form.Label>Suscripcion inicial</Form.Label>
+                <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserSuscriptions([{suscripcionId:e.target.value, startDate:new Date(), endDate:new Date(2025,1,1)}])}>
+                {suscriptions.map((scp) => (
+                  <option value={scp._id}>{scp.type}</option>
+                ))}
                 </Form.Select>
               </Form.Group>
               {/*<Form.Group controlId="formSuscriptions">
