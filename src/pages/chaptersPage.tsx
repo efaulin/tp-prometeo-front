@@ -163,14 +163,13 @@ const ChaptersPage: React.FC = () => {
               <th>Id</th>
               <th>Nombre</th>
               <th>Coleccion</th>
-              <th>Autores</th>
+              <th>Hosts</th>
               <th>Narrador</th>
-              <th>Conductores</th>
+              <th>Autores</th>
               <th>Duracion (segundos)</th>
               <th>Idioma</th>
               <th>Descripcion</th>
-              <th>Fecha de subida</th>
-              <th>Fecha de publicacion</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -179,14 +178,30 @@ const ChaptersPage: React.FC = () => {
                 <td>{chapter._id}</td>
                 <td>{chapter.name}</td>
                 <td>{collections ? collections.find(collection => collection._id == chapter.coleccionId)?.name : "-"}</td>
-                <td>{chapter.authors.map(author => author.name).join("; ")}</td>
-                {/* <td>{chapter.narrator.name}</td> */}
-                {/* <td>{chapter.hosts.map(host => host.name).join("; ")}</td> */}
+                <td>{chapter.hosts && chapter.hosts.length > 0 ? chapter.hosts.map(host => host.name).join("; ") : "Sin host"}</td>
+                {(!chapter.hosts || chapter.hosts.length === 0) && (
+                    <>
+                        <td>{chapter.narrator?.name || "Sin narrador"}</td>
+                        <td>
+                            {chapter.authors && chapter.authors.length > 0 
+                                ? chapter.authors.map(author => author.name).join("; ") 
+                                : "Sin autores"}
+                        </td>
+                    </>
+                )}
+                {(chapter.hosts && chapter.hosts.length > 0) && (
+                    <>
+                        <td>{"Sin narrador"}</td>
+                        <td>
+                            {chapter.authors && chapter.authors.length > 0 
+                                ? "Sin autores" 
+                                : "Sin autores"}
+                        </td>
+                    </>
+                )}
                 <td>{chapter.durationInSeconds}</td>
                 <td>{chapter.language.name}</td>
                 <td>{chapter.description}</td>
-                {/* <td>{chapter.uploadDate.toDateString()}</td>
-                <td>{chapter.publicationDate.toDateString()}</td> */}
                 <td>
                   <Button variant="warning" onClick={() => handleEditChapter(chapter)}>Editar</Button>{' '}
                   <Button variant="danger" onClick={() => handleDeleteChapter(chapter._id)}>Eliminar</Button>
@@ -199,7 +214,7 @@ const ChaptersPage: React.FC = () => {
         {/* Modal para añadir o editar usuario */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>{selectedChapter ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+            <Modal.Title>{selectedChapter ? 'Editar Capitulo' : 'Agregar Capitulo'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
