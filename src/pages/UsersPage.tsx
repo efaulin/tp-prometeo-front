@@ -13,12 +13,15 @@ const UsersPage: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
     const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
     const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface | null>(null);
-    const [startDay, setStartDay] = useState<number>(0);
-    const [startMonth, setStartMonth] = useState<number>(0);
-    const [startYear, setStartYear] = useState<number>(0);
-    const [endDay, setEndDay] = useState<number>(0);
-    const [endMonth, setEndMonth] = useState<number>(0);
-    const [endYear, setEndYear] = useState<number>(0);
+    const [fecha, setFecha] = useState<string>("");
+    const [fechaFinish, setFechaFinish] = useState<string>("");
+
+    const handleFechaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFecha(event.target.value);
+    };
+    const handleFechaFinishChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFechaFinish(event.target.value);
+    };
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
@@ -51,23 +54,12 @@ const UsersPage: React.FC = () => {
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
       setSelectedUserSuscriptions(user.suscripcions[0]);
-      setStartDate(new Date(user.suscripcions[0].startDate));
-      setEndDate(new Date(user.suscripcions[0].endDate));
+      setFecha(new Date(user.suscripcions[0].startDate).toISOString());
+      setFechaFinish(new Date(user.suscripcions[0].endDate).toISOString());
+      setFecha(`${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}T${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}`)
       setShowModal(true);
     };
 
-    function setStartDate(date:Date) {
-      setStartDay(date.getDay());
-      setStartMonth(date.getMonth());
-      setStartYear(date.getFullYear());
-    }
-
-    function setEndDate(date:Date) {
-      setEndDay(date.getDay());
-      setEndMonth(date.getMonth());
-      setEndYear(date.getFullYear());
-    }
-  
     const handleDeleteUser = async (userId: string) => {
       await axiosInstance.delete(`/usuario/${userId}`);
       fetchUsers();
@@ -75,10 +67,6 @@ const UsersPage: React.FC = () => {
   
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
-      console.log("startDate: " + startDay + "/" + startMonth + "/" + startYear);
-      console.log("endDate: " + endDay + "/" + endMonth + "/" + endYear);
-      console.log("newStartDate: " + new Date(startYear, startMonth, startDay).toISOString());
-      console.log("newEndDate: " + new Date(endYear, endMonth, endDay).toISOString());
       console.log(selectedUser);
       if (selectedUser!._id != "0") {
         // Editar usuario
@@ -89,8 +77,8 @@ const UsersPage: React.FC = () => {
           role: userRole?._id,
           suscripcions: [
             {
-              startDate: new Date(startYear, startMonth, startDay).toISOString(),
-              endDate: new Date(endYear, endMonth, endDay).toISOString(),
+              startDate: new Date(fecha).toISOString(),
+              endDate: new Date(fechaFinish).toISOString(),
               suscripcionId: userSuscriptions?.suscripcionId._id,
             }
           ],
@@ -201,83 +189,29 @@ const UsersPage: React.FC = () => {
               <Form.Group controlId="formStartDate">
                 <Form.Label>Fecha inico</Form.Label>
                 <Row>
-                  <Col>
-                    <Form.Group controlId="formStartDay">
-                      <Form.Label>Día</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={startDay}
-                        maxLength={2}
-                        placeholder="DD"
-                        onChange={(e) => setStartDay(Number.parseInt(e.target.value))}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formStartMonth">
-                      <Form.Label>Mes</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={startMonth}
-                        maxLength={2}
-                        placeholder="MM"
-                        onChange={(e) => setStartMonth(Number.parseInt(e.target.value))}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formStartYear">
-                      <Form.Label>Año</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={startYear}
-                        maxLength={4}
-                        placeholder="YYYY"
-                        onChange={(e) => setStartYear(Number.parseInt(e.target.value))}
-                      />
-                    </Form.Group>
-                  </Col>
+                <label>
+                    Selecciona una fecha Inicial:
+                    <input 
+                        type="datetime-local" 
+                        value={fecha} 
+                        onChange={handleFechaChange} 
+                        required 
+                    />
+                </label>
                 </Row>
               </Form.Group>
               <Form.Group controlId="formEndDate">
                 <Form.Label>Fecha fin</Form.Label>
                 <Row>
-                  <Col>
-                    <Form.Group controlId="formEndDay">
-                      <Form.Label>Día</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={endDay}
-                        maxLength={2}
-                        placeholder="DD"
-                        onChange={(e) => setEndDay(Number.parseInt(e.target.value))}
+                  <label>
+                      Selecciona una fecha Final:
+                      <input 
+                          type="datetime-local" 
+                          value={fechaFinish}
+                          onChange={handleFechaFinishChange} 
+                          required 
                       />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formEndMonth">
-                      <Form.Label>Mes</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={endMonth}
-                        maxLength={2}
-                        placeholder="MM"
-                        onChange={(e) => setEndMonth(Number.parseInt(e.target.value))}
-                      />
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group controlId="formEndYear">
-                      <Form.Label>Año</Form.Label>
-                      <Form.Control
-                        type="number"
-                        value={endYear}
-                        maxLength={4}
-                        placeholder="YYYY"
-                        onChange={(e) => setEndYear(Number.parseInt(e.target.value))}
-                      />
-                    </Form.Group>
-                  </Col>
+                  </label>
                 </Row>
               </Form.Group>
               <br/>
