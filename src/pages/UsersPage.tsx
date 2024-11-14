@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form, Row, Col } from 'react-bootstrap';
+import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
 import { RoleInterface } from '../interfaces/roleInterface';
@@ -54,9 +54,8 @@ const UsersPage: React.FC = () => {
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
       setSelectedUserSuscriptions(user.suscripcions[0]);
-      setFecha(new Date(user.suscripcions[0].startDate).toISOString());
-      setFechaFinish(new Date(user.suscripcions[0].endDate).toISOString());
-      setFecha(`${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}T${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}`)
+      setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
     };
 
@@ -172,7 +171,7 @@ const UsersPage: React.FC = () => {
               </Form.Group>
               <Form.Group controlId="formRole">
                 <Form.Label>Tipo de usuario</Form.Label>
-                <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
+                <Form.Select aria-label="Seleccione rol del usuario" value={userRole ? userRole._id : ""} required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
                   <option value="673124570945b0b475fe07c8">admin</option>
                   <option value="67327c62f40be4d6fc0933ae">client</option>
                 </Form.Select>
@@ -180,7 +179,7 @@ const UsersPage: React.FC = () => {
               <br/>
               <Form.Group controlId="formSuscripcionId">
                 <Form.Label>Suscripcion inicial</Form.Label>
-                <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
+                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions ? userSuscriptions.suscripcionId._id : ""} required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
                 {suscriptions.map((scp) => (
                   <option value={scp._id}>{scp.type}</option>
                 ))}
