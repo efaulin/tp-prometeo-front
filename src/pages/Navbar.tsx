@@ -32,6 +32,7 @@ function NavBar() {
                 <NavDropdown title="CRUDS" id="navbarScrollingDropdown">
                 <NavDropdown.Item as={Link} to="/users">Users</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/idiomas">Idiomas</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/narradores">Narradores</NavDropdown.Item>
                 </NavDropdown>
             </Nav>
             {user && user.username ? (
