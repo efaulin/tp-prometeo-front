@@ -93,7 +93,11 @@ const ChaptersPage: React.FC = () => {
     const handleEditChapter = (chapter: ChapterInterface) => {
       setSelectedChapter(chapter);
       setSelectedCollection({_id: chapter.coleccionId, name:"", description:""} as CollectionInterface);
-      setSelectedLanguage(chapter.language);
+      setSelectedLanguage(chapter.language as LanguageInterface);
+      console.log("chap.Langua: ");
+      console.log(chapter.language);
+      console.log("selectLangua: ");
+      console.log(selectedLanguage);
       if (chapter.hosts) {
         setSelectedHosts(chapter.hosts);
         setSelectedAuthors([]);
@@ -106,6 +110,7 @@ const ChaptersPage: React.FC = () => {
       //setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
       //setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
+      fetchChapters();
     };
 
     const handleDeleteChapter = async (chapterId: string) => {
@@ -133,7 +138,6 @@ const ChaptersPage: React.FC = () => {
         console.log(updChapter);
         const result = await axiosInstance.put(`/capitulo/${selectedChapter!._id}`, updChapter);
         console.log(result);
-        fetchChapters();
       } else {
         // Añadir usuario
         const newUser = {
@@ -147,7 +151,6 @@ const ChaptersPage: React.FC = () => {
           publicationDate: new Date().toISOString()
         }
         await axiosInstance.post('/capitulo', newUser);
-        fetchChapters();
       }
       setShowModal(false);
       fetchChapters();
@@ -156,12 +159,11 @@ const ChaptersPage: React.FC = () => {
     return (
       <div>
         <NavBar/>
-        <h2>Usuarios</h2>
-        <Button onClick={handleAddChapter}>Agregar Capitulo</Button>
+        <h2 className='mb-3'>Capitulos</h2>
+        <Button className='mb-3' onClick={handleAddChapter}>Agregar Capitulo</Button>
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Id</th>
               <th>Nombre</th>
               <th>Coleccion</th>
               <th>Hosts</th>
@@ -176,7 +178,6 @@ const ChaptersPage: React.FC = () => {
           <tbody>
             {chapters.map((chapter) => (
               <tr key={chapter._id}>
-                <td>{chapter._id}</td>
                 <td>{chapter.name}</td>
                 <td>{collections ? collections.find(collection => collection._id == chapter.coleccionId)?.name : "-"}</td>
                 <td>{chapter.hosts && chapter.hosts.length > 0 ? chapter.hosts.map(host => host.name).join("; ") : "Sin host"}</td>
@@ -243,7 +244,7 @@ const ChaptersPage: React.FC = () => {
                 <Form.Select aria-label="Seleccione Coleccion" value={selectedCollection ? selectedCollection._id : ""} required onChange={(e) => setSelectedCollection({ ...setCollections, _id: e.target.value } as CollectionInterface)}>
                   {
                     collections.map((collection)=> (
-                      <option value="${collection._id}">${collection.name}</option>
+                      <option value={collection._id}>{collection.name}</option>
                     ))
                   }
                 </Form.Select>
@@ -254,7 +255,7 @@ const ChaptersPage: React.FC = () => {
                 <Form.Select aria-label="Seleccione Idioma" value={selectedLanguage ? selectedLanguage._id : ""} required onChange={(e) => setSelectedLanguage({ ...setSelectedLanguage, _id: e.target.value } as LanguageInterface)}>
                   {
                     languages.map((language)=> (
-                      <option value="${language._id}">${language.name}</option>
+                      <option value={language._id}>{language.name}</option>
                     ))
                   }
                 </Form.Select>
