@@ -1,20 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
-import { RoleInterface } from '../interfaces/roleInterface';
 import NavBar from './Navbar';
-import { SuscriptionInterface } from '../interfaces/suscriptionInterface';
+import { LanguageInterface } from '../interfaces/languageInterface';
+import { NarratorInterface } from '../interfaces/narratorInterface';
+import { AuthorInterface } from '../interfaces/authorInterface';
+import { HostInterface } from '../interfaces/hostInterface';
+import { CollectionInterface } from '../interfaces/collectionInterface';
+import { ChapterInterface } from '../interfaces/chapterInterface';
 
 const UsersPage: React.FC = () => {
-    const [users, setUsers] = useState<UserInterface[]>([]);
-    const [suscriptions, setSuscriptions] = useState<SuscriptionInterface[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
-    const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
-    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface | null>(null);
-    const [fecha, setFecha] = useState<string>("");
-    const [fechaFinish, setFechaFinish] = useState<string>("");
+    const [chapters, setChapters] = useState<ChapterInterface[]>([]);
+    const [languages, setLanguages] = useState<LanguageInterface[]>([]);
+    const [narrators, setNarrators] = useState<NarratorInterface[]>([]);
+    const [authors, setAuthors] = useState<AuthorInterface[]>([]);
+    const [hosts, setHosts] = useState<HostInterface[]>([]);
+    const [collections, setCollections] = useState<CollectionInterface[]>([]);
+    const [selectedChapter, setSelectedChapter] = useState<ChapterInterface>();
 
     const handleFechaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       setFecha(event.target.value);
@@ -25,43 +28,71 @@ const UsersPage: React.FC = () => {
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
-      fetchUsers();
-      fetchSuscriptions()
+      fetchChapters();
+      fetchLanguages();
+      fetchNarrators();
+      fetchAuthors();
+      fetchHosts();
+      fetchCollections();
     }, []);
   
-    const fetchUsers = async () => {
-      const response = await axiosInstance.get('/usuario');
-      setUsers(response.data);
+    const fetchChapters = async () => {
+      const response = await axiosInstance.get('/capitulo');
+      setChapters(response.data);
     };
 
-    const fetchSuscriptions = async () => {
-      const response = await axiosInstance.get('/suscripcion');
-      setSuscriptions(response.data);
+    const fetchLanguages = async () => {
+      const response = await axiosInstance.get('/idioma');
+      setLanguages(response.data);
     };
-    //TODO Probar no se haya roto create
-    const handleAddUser = () => {
-      setSelectedUser({
+
+    const fetchNarrators = async () => {
+      const response = await axiosInstance.get('/narrador');
+      setNarrators(response.data);
+    };
+
+    const fetchAuthors = async () => {
+      const response = await axiosInstance.get('/autor');
+      setAuthors(response.data);
+    };
+
+    const fetchHosts = async () => {
+      const response = await axiosInstance.get('/conductor');
+      setHosts(response.data);
+    };
+
+    const fetchCollections = async () => {
+      const response = await axiosInstance.get('/coleccion');
+      setCollections(response.data);
+    };
+
+    const handleAddChapter = () => {
+      setSelectedChapter({
         _id: "0",
-        username: "",
-        email: "",
-        role: users[0].role,
-        suscripcions: users[0].suscripcions,
-      } as UserInterface); // Limpiar selección para añadir
+        coleccionId: "",
+        name: "",
+        authors: [],
+        narrator: {_id: "0", name: ""} as NarratorInterface,
+        hosts: [],
+        durationInSeconds: 0,
+        language: {_id: "0", name: ""} as LanguageInterface,
+        description: "",
+        uploadDate: new Date(),
+        publicationDate: new Date(),
+      } as ChapterInterface); // Limpiar selección para añadir
       setShowModal(true);
     };
   
-    const handleEditUser = (user: UserInterface) => {
-      setSelectedUser(user); // Seleccionar usuario para editar
-      setSelectedUserRole(user.role);
-      setSelectedUserSuscriptions(user.suscripcions[0]);
-      setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
-      setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
+    const handleEditChapter = (chapter: ChapterInterface) => {
+      setSelectedChapter(chapter);
+      //setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      //setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
     };
 
-    const handleDeleteUser = async (userId: string) => {
-      await axiosInstance.delete(`/usuario/${userId}`);
-      fetchUsers();
+    const handleDeleteChapter = async (chapterId: string) => {
+      await axiosInstance.delete(`/capitulo/${chapterId}`);
+      fetchChapters();
     };
   
     const handleSubmit = async (event: React.FormEvent) => {
@@ -112,20 +143,37 @@ const UsersPage: React.FC = () => {
       <div>
         <NavBar/>
         <h2>Usuarios</h2>
-        <Button onClick={handleAddUser}>Agregar Usuario</Button>
+        <Button onClick={handleAddChapter}>Agregar Capitulo</Button>
         <Table striped bordered hover>
           <thead>
             <tr>
-              <th>Nombre de usuario</th>
-              <th>Email</th>
-              <th>Acciones</th>
+              <th>Id</th>
+              <th>Nombre</th>
+              <th>Coleccion</th>
+              <th>Autores</th>
+              <th>Narrador</th>
+              <th>Conductores</th>
+              <th>Duracion (segundos)</th>
+              <th>Idioma</th>
+              <th>Descripcion</th>
+              <th>Fecha de subida</th>
+              <th>Fecha de publicacion</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.email}>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
+            {chapters.map((chapter) => (
+              <tr key={chapter._id}>
+                <td>{chapter._id}</td>
+                <td>{chapter.name}</td>
+                <td>{collections ? collections.find(collection => collection._id == chapter.coleccionId)?.name : "-"}</td>
+                <td>{chapter.authors.map(author => author.name).join("; ")}</td>
+                <td>{chapter.narrator.name}</td>
+                <td>{chapter.hosts.map(host => host.name).join("; ")}</td>
+                <td>{chapter.durationInSeconds}</td>
+                <td>{chapter.language.name}</td>
+                <td>{chapter.description}</td>
+                <td>{chapter.uploadDate.toDateString()}</td>
+                <td>{chapter.publicationDate.toDateString()}</td>
                 <td>
                   <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
                   <Button variant="danger" onClick={() => handleDeleteUser(user._id)}>Eliminar</Button>
