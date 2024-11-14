@@ -14,11 +14,16 @@ const ChaptersPage: React.FC = () => {
     const [chapters, setChapters] = useState<ChapterInterface[]>([]);
     const [languages, setLanguages] = useState<LanguageInterface[]>([]);
     const [narrators, setNarrators] = useState<NarratorInterface[]>([]);
-    const [selectedNarrator, setSelectedNarrator] = useState<NarratorInterface>(null);
     const [authors, setAuthors] = useState<AuthorInterface[]>([]);
     const [hosts, setHosts] = useState<HostInterface[]>([]);
     const [collections, setCollections] = useState<CollectionInterface[]>([]);
     const [selectedChapter, setSelectedChapter] = useState<ChapterInterface>();
+    const [selectedCollection, setSelectedCollection] = useState<CollectionInterface>();
+    const [selectedNarrator, setSelectedNarrator] = useState<NarratorInterface>();
+    const [selectedLanguage, setSelectedLanguage] = useState<LanguageInterface>();
+    const [selectedAuthors, setSelectedAuthors] = useState<AuthorInterface[]>();
+    const [selectedHosts, setSelectedHosts] = useState<HostInterface[]>();
+    const [selectedPublicationDate, setSelectedPublicationDate] = useState<string>();
 
     // const handleFechaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     //   setFecha(event.target.value);
@@ -87,6 +92,17 @@ const ChaptersPage: React.FC = () => {
   
     const handleEditChapter = (chapter: ChapterInterface) => {
       setSelectedChapter(chapter);
+      setSelectedCollection({_id: chapter.coleccionId, name:"", description:""} as CollectionInterface);
+      setSelectedLanguage(chapter.language);
+      if (chapter.hosts) {
+        setSelectedHosts(chapter.hosts);
+        setSelectedAuthors([]);
+        setSelectedNarrator({} as NarratorInterface);
+      } else {
+        setSelectedHosts([]);
+        setSelectedAuthors(chapter.authors);
+        setSelectedNarrator(chapter.narrator);
+      }
       //setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
       //setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
@@ -100,45 +116,40 @@ const ChaptersPage: React.FC = () => {
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
       console.log(selectedChapter);
-      // if (selectedUser!._id != "0") {
-      //   // Editar usuario
-      //   const updUser = {
-      //     username: selectedUser!.username,
-      //     password: selectedUser!.password,
-      //     email: selectedUser!.email,
-      //     role: userRole?._id,
-      //     suscripcions: [
-      //       {
-      //         startDate: new Date(fecha).toISOString(),
-      //         endDate: new Date(fechaFinish).toISOString(),
-      //         suscripcionId: userSuscriptions?.suscripcionId._id,
-      //       }
-      //     ],
-      //   }
-      //   console.log("updUsr: ");
-      //   console.log(updUser);
-      //   const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
-      //   console.log(result);
-      //   fetchChapters();
-      // } else {
-      //   // Añadir usuario
-      //   const newUser = {
-      //     username: selectedUser!.username,
-      //     password: selectedUser!.password,
-      //     email: selectedUser!.email,
-      //     role: userRole?._id,
-      //     suscripcions: [
-      //       {
-      //         startDate: selectedUser!.suscripcions[0].startDate,
-      //         endDate: selectedUser!.suscripcions[0].endDate,
-      //         suscripcionId: "670c3b7ef2006065e258366c",
-      //       }
-      //     ],
-      //   }
-      //   await axiosInstance.post('/usuario', newUser);
-      // }
-      // setShowModal(false);
-      // fetchChapters();
+      if (selectedChapter!._id != "0") {
+        // Editar usuario
+        const updChapter = {
+          coleccionId: selectedCollection?._id,
+          name: selectedChapter?.name,
+          hosts: [hosts[0]._id],
+          durationInSeconds: selectedChapter?.durationInSeconds,
+          language: selectedLanguage?._id,
+          description: selectedChapter?.description,
+          uploadDate: new Date().toISOString(),
+          publicationDate: new Date().toISOString()
+        }
+        
+        console.log("updChapter: ");
+        console.log(updChapter);
+        const result = await axiosInstance.put(`/usuario/${selectedChapter!._id}`, updChapter);
+        console.log(result);
+        fetchChapters();
+      } else {
+        // Añadir usuario
+        const newUser = {
+          coleccionId: selectedCollection?._id,
+          name: selectedChapter?.name,
+          hosts: [hosts[0]._id],
+          durationInSeconds: 15,
+          language: selectedLanguage?._id,
+          description: selectedChapter?.description,
+          uploadDate: new Date().toISOString(),
+          publicationDate: new Date().toISOString()
+        }
+        await axiosInstance.post('/usuario', newUser);
+      }
+      setShowModal(false);
+      fetchChapters();
     };
   
     return (
@@ -193,57 +204,45 @@ const ChaptersPage: React.FC = () => {
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
               <Form.Group controlId="formName">
-                <Form.Label>Nombre de usuario</Form.Label>
+                <Form.Label>Nombre de capitulo</Form.Label>
                 <Form.Control
                   required
                   type="text"
                   value={selectedChapter?.name || ''}
-                  onChange={(e) => setSelectedChapter({ ...selectedChapter, username: e.target.value } as ChapterInterface)}
+                  onChange={(e) => setSelectedChapter({ ...selectedChapter, name: e.target.value } as ChapterInterface)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formDescription">
+                <Form.Label>Descripcion de capitulo</Form.Label>
+                <Form.Control
+                  required
+                  type="text"
+                  value={selectedChapter?.description || ''}
+                  onChange={(e) => setSelectedChapter({ ...selectedChapter, description: e.target.value } as ChapterInterface)}
                 />
               </Form.Group>
               
-             
-              <Form.Group controlId="formRole">
-                <Form.Label>Tipo de usuario</Form.Label>
-                <Form.Select aria-label="Seleccione Narrador" value={selectedNarrator ? selectedNarrator._id : ""} required onChange={(e) => setSelectedNarrator({ ...setSelectedNarrator, _id: e.target.value } as NarratorInterface)}>
+              <Form.Group controlId="formCollection">
+                <Form.Label>Coleccion a la que pertenece</Form.Label>
+                <Form.Select aria-label="Seleccione Coleccion" value={selectedCollection ? selectedCollection._id : ""} required onChange={(e) => setSelectedCollection({ ...setCollections, _id: e.target.value } as CollectionInterface)}>
                   {
-                    narrators.map((narrador)=>{
-                      return `<option value="${narrador._id}">${narrador.name}</option>`
-                    })
+                    collections.map((collection)=> (
+                      <option value="${collection._id}">${collection.name}</option>
+                    ))
                   }
                 </Form.Select>
               </Form.Group>
 
-
-{/*               
-              <Form.Group controlId="formStartDate">
-                <Form.Label>Fecha inico</Form.Label>
-                <Row>
-                <label>
-                    Selecciona una fecha Inicial:
-                    <input 
-                        type="datetime-local" 
-                        value={fecha} 
-                        onChange={handleFechaChange} 
-                        required 
-                    />
-                </label>
-                </Row>
+              <Form.Group controlId="formLanguage">
+                <Form.Label>Idioma del capitulo</Form.Label>
+                <Form.Select aria-label="Seleccione Idioma" value={selectedLanguage ? selectedLanguage._id : ""} required onChange={(e) => setSelectedLanguage({ ...setSelectedLanguage, _id: e.target.value } as LanguageInterface)}>
+                  {
+                    languages.map((language)=> (
+                      <option value="${language._id}">${language.name}</option>
+                    ))
+                  }
+                </Form.Select>
               </Form.Group>
-              <Form.Group controlId="formEndDate">
-                <Form.Label>Fecha fin</Form.Label>
-                <Row>
-                  <label>
-                      Selecciona una fecha Final:
-                      <input 
-                          type="datetime-local" 
-                          value={fechaFinish}
-                          onChange={handleFechaFinishChange} 
-                          required 
-                      />
-                  </label>
-                </Row>
-              </Form.Group> */}
               <br/>
               <Button variant="primary" type="submit">
                 {selectedChapter ? 'Guardar cambios' : 'Agregar'}
