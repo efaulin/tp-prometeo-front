@@ -10,8 +10,9 @@ const DashboardPage = () => {
             <h1>Home Page Dashboard</h1>
             {user && user.username ? (
                 <div>
-                    <p>¡Has iniciado sesión exitosamente!</p>
                     <h2>Bienvenido {user.username}</h2>
+                    <h2>{user.role.name}</h2>
+                    <p>¡Has iniciado sesión exitosamente!</p>
                 </div>
 
             ) : (
