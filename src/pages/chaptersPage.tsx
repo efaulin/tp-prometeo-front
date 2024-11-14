@@ -131,7 +131,7 @@ const ChaptersPage: React.FC = () => {
         
         console.log("updChapter: ");
         console.log(updChapter);
-        const result = await axiosInstance.put(`/usuario/${selectedChapter!._id}`, updChapter);
+        const result = await axiosInstance.put(`/capitulo/${selectedChapter!._id}`, updChapter);
         console.log(result);
         fetchChapters();
       } else {
@@ -146,7 +146,8 @@ const ChaptersPage: React.FC = () => {
           uploadDate: new Date().toISOString(),
           publicationDate: new Date().toISOString()
         }
-        await axiosInstance.post('/usuario', newUser);
+        await axiosInstance.post('/capitulo', newUser);
+        fetchChapters();
       }
       setShowModal(false);
       fetchChapters();
