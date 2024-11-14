@@ -96,9 +96,9 @@ const UsersPage: React.FC = () => {
           role: userRole?._id,
           suscripcions: [
             {
-              startDate: selectedUser!.suscripcions[0].startDate,
-              endDate: selectedUser!.suscripcions[0].endDate,
-              suscripcionId: "670c3b7ef2006065e258366c",
+              startDate: new Date(fecha).toISOString(),
+              endDate: new Date(fechaFinish).toISOString(),
+              suscripcionId: userSuscriptions?.suscripcionId._id,
             }
           ],
         }
