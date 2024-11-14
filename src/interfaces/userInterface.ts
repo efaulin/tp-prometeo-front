@@ -3,8 +3,8 @@ import { SuscriptionInterface } from "./suscriptionInterface";
 
 export interface UserSuscriptionInterface {
     _id: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     suscripcionId: SuscriptionInterface;
 }
 

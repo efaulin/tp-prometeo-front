@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Button, Modal, Form } from 'react-bootstrap';
+import { Table, Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
 import { RoleInterface } from '../interfaces/roleInterface';
@@ -12,11 +12,18 @@ const UsersPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
     const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
-    const [userSuscriptions, setSelectedUserSuscriptions] = useState<{suscripcionId:string, startDate:Date, endDate:Date}[] | null>([]);
-  
+    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface | null>(null);
+    const [startDay, setStartDay] = useState<number>(0);
+    const [startMonth, setStartMonth] = useState<number>(0);
+    const [startYear, setStartYear] = useState<number>(0);
+    const [endDay, setEndDay] = useState<number>(0);
+    const [endMonth, setEndMonth] = useState<number>(0);
+    const [endYear, setEndYear] = useState<number>(0);
+
     // Obtener usuarios al cargar la página
     useEffect(() => {
       fetchUsers();
+      fetchSuscriptions()
     }, []);
   
     const fetchUsers = async () => {
@@ -28,9 +35,8 @@ const UsersPage: React.FC = () => {
       const response = await axiosInstance.get('/suscripcion');
       setSuscriptions(response.data);
     };
-  
+
     const handleAddUser = () => {
-      if (!suscriptions) fetchSuscriptions();
       setSelectedUser({
         _id: "0",
         username: "",
@@ -42,12 +48,25 @@ const UsersPage: React.FC = () => {
     };
   
     const handleEditUser = (user: UserInterface) => {
-      if (!suscriptions) fetchSuscriptions();
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
-      setSelectedUserSuscriptions(user.suscripcions.map((suscp) => ({suscripcionId:suscp.suscripcionId.toString(), startDate:suscp.startDate, endDate:suscp.endDate})) as {suscripcionId:string, startDate:Date, endDate:Date}[]);
+      setSelectedUserSuscriptions(user.suscripcions[0]);
+      setStartDate(new Date(user.suscripcions[0].startDate));
+      setEndDate(new Date(user.suscripcions[0].endDate));
       setShowModal(true);
     };
+
+    function setStartDate(date:Date) {
+      setStartDay(date.getDay());
+      setStartMonth(date.getMonth());
+      setStartYear(date.getFullYear());
+    }
+
+    function setEndDate(date:Date) {
+      setEndDay(date.getDay());
+      setEndMonth(date.getMonth());
+      setEndYear(date.getFullYear());
+    }
   
     const handleDeleteUser = async (userId: string) => {
       await axiosInstance.delete(`/usuario/${userId}`);
@@ -56,6 +75,10 @@ const UsersPage: React.FC = () => {
   
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
+      console.log("startDate: " + startDay + "/" + startMonth + "/" + startYear);
+      console.log("endDate: " + endDay + "/" + endMonth + "/" + endYear);
+      console.log("newStartDate: " + new Date(startYear, startMonth, startDay).toISOString());
+      console.log("newEndDate: " + new Date(endYear, endMonth, endDay).toISOString());
       console.log(selectedUser);
       if (selectedUser!._id != "0") {
         // Editar usuario
@@ -66,13 +89,17 @@ const UsersPage: React.FC = () => {
           role: userRole?._id,
           suscripcions: [
             {
-              startDate: selectedUser!.suscripcions[0].startDate,
-              endDate: selectedUser!.suscripcions[0].endDate,
-              suscripcionId: "670c3b7ef2006065e258366c",
+              startDate: new Date(startYear, startMonth, startDay).toISOString(),
+              endDate: new Date(endYear, endMonth, endDay).toISOString(),
+              suscripcionId: userSuscriptions?.suscripcionId._id,
             }
           ],
         }
-        await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
+        console.log("updUsr: ");
+        console.log(updUser);
+        const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
+        console.log(result);
+        fetchUsers();
       } else {
         // Añadir usuario
         const newUser = {
@@ -162,22 +189,98 @@ const UsersPage: React.FC = () => {
                   <option value="67327c62f40be4d6fc0933ae">client</option>
                 </Form.Select>
               </Form.Group>
+              <br/>
               <Form.Group controlId="formSuscripcionId">
                 <Form.Label>Suscripcion inicial</Form.Label>
-                <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserSuscriptions([{suscripcionId:e.target.value, startDate:new Date(), endDate:new Date(2025,1,1)}])}>
+                <Form.Select aria-label="Default select example" required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
                 {suscriptions.map((scp) => (
                   <option value={scp._id}>{scp.type}</option>
                 ))}
                 </Form.Select>
               </Form.Group>
-              {/*<Form.Group controlId="formSuscriptions">
-                <Form.Label>Suscripciones</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={selectedUser?.suscripcions.toString() || ''}
-                  onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions} as UserSuscriptionInterface[])}
-                />
-              </Form.Group>*/}
+              <Form.Group controlId="formStartDate">
+                <Form.Label>Fecha inico</Form.Label>
+                <Row>
+                  <Col>
+                    <Form.Group controlId="formStartDay">
+                      <Form.Label>Día</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={startDay}
+                        maxLength={2}
+                        placeholder="DD"
+                        onChange={(e) => setStartDay(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="formStartMonth">
+                      <Form.Label>Mes</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={startMonth}
+                        maxLength={2}
+                        placeholder="MM"
+                        onChange={(e) => setStartMonth(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="formStartYear">
+                      <Form.Label>Año</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={startYear}
+                        maxLength={4}
+                        placeholder="YYYY"
+                        onChange={(e) => setStartYear(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Form.Group>
+              <Form.Group controlId="formEndDate">
+                <Form.Label>Fecha fin</Form.Label>
+                <Row>
+                  <Col>
+                    <Form.Group controlId="formEndDay">
+                      <Form.Label>Día</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={endDay}
+                        maxLength={2}
+                        placeholder="DD"
+                        onChange={(e) => setEndDay(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="formEndMonth">
+                      <Form.Label>Mes</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={endMonth}
+                        maxLength={2}
+                        placeholder="MM"
+                        onChange={(e) => setEndMonth(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group controlId="formEndYear">
+                      <Form.Label>Año</Form.Label>
+                      <Form.Control
+                        type="number"
+                        value={endYear}
+                        maxLength={4}
+                        placeholder="YYYY"
+                        onChange={(e) => setEndYear(Number.parseInt(e.target.value))}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Form.Group>
+              <br/>
               <Button variant="primary" type="submit">
                 {selectedUser ? 'Guardar cambios' : 'Agregar'}
               </Button>
