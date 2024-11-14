@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import { UserInterface } from '../interfaces/userInterface'; 
+import NavBar from './Navbar';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<UserInterface[]>([]);
@@ -49,6 +50,7 @@ const UsersPage: React.FC = () => {
   
     return (
       <div>
+        <NavBar/>
         <h2>Usuarios</h2>
         <Button onClick={handleAddUser}>Agregar Usuario</Button>
         <Table striped bordered hover>
