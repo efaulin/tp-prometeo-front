@@ -38,7 +38,7 @@ const UsersPage: React.FC = () => {
       const response = await axiosInstance.get('/suscripcion');
       setSuscriptions(response.data);
     };
-    //TODO Probar no se haya roto create
+    
     const handleAddUser = () => {
       setSelectedUser({
         _id: "0",
