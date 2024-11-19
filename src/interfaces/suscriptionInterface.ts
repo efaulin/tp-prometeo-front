@@ -1,39 +1,55 @@
 export interface SuscriptionPriceInterface{
-    _id: string;
+    _id?: string;
     startDate: string;
     amount: number;
-    suscripcionId: string;
+    suscripcionId: SuscriptionInterface;
 }
 
 export interface SuscriptionInterface {
-    _id: string;
+    _id?: string;
     type: string;
 }
 
 export class SuscriptionPrice {
-    //ASK ¿Y si quiero crear uno nuevo, osea sin id?
-    readonly _id: string;
-    private startDate: Date;
-    private amount: number;
-    private suscripcionId: string;
+    readonly id?: string;
+    public startDate: Date;
+    public amount: number;
+    public suscripcionId: Suscription | null;
 
     constructor({_id, startDate, amount, suscripcionId}:SuscriptionPriceInterface) {
-        this._id = _id;
+        this.id = _id;
         this.startDate = new Date(startDate);
         this.amount = amount;
-        this.suscripcionId = suscripcionId;
+        this.suscripcionId = Suscription.New(suscripcionId);
+    }
+
+    public toAPI() {
+        return {
+            startDate: this.startDate.toISOString(),
+            amount: this.amount,
+            suscricionId: this.suscripcionId!.id!,
+        };
     }
 }
 
 export class Suscription {
-    //ASK ¿Y si quiero crear uno nuevo, osea sin id?
-    readonly _id: string;
-    private type: string;
-    //ASK Ahhh y esto? A ver, MANEJALO
-    private prices: SuscriptionPrice[];
+    readonly id?: string;
+    public type: string;
 
     constructor({_id, type}:SuscriptionInterface) {
-        this._id = _id;
+        this.id = _id;
         this.type = type;
+    }
+
+    //TODO Testear esto
+    static New({_id, type}:SuscriptionInterface): Suscription | null {
+        if (!type) return null;
+        return new Suscription({_id, type});
+    }
+
+    public toAPI() {
+        return {
+            type: this.type,
+        };
     }
 }
