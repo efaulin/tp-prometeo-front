@@ -1,5 +1,5 @@
 import { Role, RoleInterface } from "./roleInterface";
-import { SuscriptionInterface } from "./suscriptionInterface";
+import { Suscription, SuscriptionInterface } from "./suscriptionInterface";
 
 export interface UserSuscriptionInterface {
     _id?: string;
@@ -19,43 +19,34 @@ export interface UserInterface {
 
 export class UserSuscription {
     readonly id?: string;
-    public startDate: Date;
-    public endDate: Date;
-    private suscripcionId: SuscriptionInterface | string;
+    private startDate: Date;
+    private endDate: Date;
+    private suscripcionId: Suscription | null; //[ ] Probando el null
 
     constructor({_id, startDate, endDate, suscripcionId}:UserSuscriptionInterface) {
         this.id = _id;
         this.startDate = new Date(startDate);
         this.endDate = new Date(endDate);
-        this.suscripcionId = suscripcionId;
+        this.suscripcionId = Suscription.New(suscripcionId);
     }
 
-    public getSuscription() : SuscriptionInterface | null {
-        if (typeof this.suscripcionId == "string") {
-            return null;
-        }
+    public getStartDate() {
+        return this.startDate;
+    }
+
+    public getEndDate() {
+        return this.endDate;
+    }
+
+    public getSuscription() {
         return this.suscripcionId;
-    }
-    //ASK ¿Me sirve pasar un id de una "Suscription" que ya no existe?
-    public getSuscriptionId() : string {
-        if (typeof this.suscripcionId == "string") {
-            return this.suscripcionId;
-        }
-        return this.suscripcionId._id!;
-    }
-
-    public getSuscriptionType() : string | null {
-        if (typeof this.suscripcionId == "string") {
-            return null;
-        }
-        return this.suscripcionId.type;
     }
 
     public toAPI() {
         return {
             startDate: this.startDate.toISOString(),
             endDate: this.endDate.toISOString(),
-            suscripcionId: this.getSuscriptionId(),
+            suscripcionId: this.suscripcionId!.id,
         };
     }
 }

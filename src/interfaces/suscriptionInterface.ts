@@ -12,15 +12,27 @@ export interface SuscriptionInterface {
 
 export class SuscriptionPrice {
     readonly id?: string;
-    public startDate: Date;
-    public amount: number;
-    public suscripcionId: Suscription | null;
+    private startDate: Date;
+    private amount: number;
+    private suscripcionId: Suscription | null;
 
     constructor({_id, startDate, amount, suscripcionId}:SuscriptionPriceInterface) {
         this.id = _id;
         this.startDate = new Date(startDate);
         this.amount = amount;
         this.suscripcionId = Suscription.New(suscripcionId);
+    }
+
+    public getStartDate() {
+        return this.startDate;
+    }
+
+    public getAmount() {
+        return this.amount;
+    }
+
+    public getSuscription() {
+        return this.suscripcionId;
     }
 
     public toAPI() {

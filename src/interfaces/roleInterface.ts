@@ -17,21 +17,6 @@ export class Role {
         return new Role({_id, name});
     }
 
-    //ASK ¿Me sirve pasar un id de un "Role" que ya no existe?
-    // public getId(): string {
-    //     if (typeof this.role == "string") {
-    //         return this.role;
-    //     }
-    //     return this.role._id!;
-    // }
-
-    // public getRoleName(): string | null {
-    //     if (typeof this.role == "string") {
-    //         return null;
-    //     }
-    //     return this.role.name;
-    // }
-
     public toAPI() {
         return {
             name: this.name,
