@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
+import { User, UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
 import { RoleInterface } from '../interfaces/roleInterface';
 import NavBar from './Navbar';
 import { SuscriptionInterface } from '../interfaces/suscriptionInterface';
 
 const UsersPage: React.FC = () => {
-    const [users, setUsers] = useState<UserInterface[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
     const [suscriptions, setSuscriptions] = useState<SuscriptionInterface[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
@@ -31,7 +31,7 @@ const UsersPage: React.FC = () => {
   
     const fetchUsers = async () => {
       const response = await axiosInstance.get('/usuario');
-      setUsers(response.data);
+      setUsers((response.data as UserInterface[]).map(usr => new User(usr)));
     };
 
     const fetchSuscriptions = async () => {
@@ -40,23 +40,23 @@ const UsersPage: React.FC = () => {
     };
     
     const handleAddUser = () => {
-      setSelectedUser({
-        _id: "0",
-        username: "",
-        email: "",
-        role: users[0].role,
-        suscripcions: users[0].suscripcions,
-      } as UserInterface); // Limpiar selección para añadir
-      setShowModal(true);
+      // setSelectedUser({
+      //   _id: "0",
+      //   username: "",
+      //   email: "",
+      //   role: users[0].role,
+      //   suscripcions: users[0].suscripcions,
+      // } as UserInterface); // Limpiar selección para añadir
+      // setShowModal(true);
     };
   
-    const handleEditUser = (user: UserInterface) => {
-      setSelectedUser(user); // Seleccionar usuario para editar
-      setSelectedUserRole(user.role);
-      setSelectedUserSuscriptions(user.suscripcions[0]);
-      setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
-      setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
-      setShowModal(true);
+    const handleEditUser = (user: User) => {
+      // setSelectedUser(user); // Seleccionar usuario para editar
+      // setSelectedUserRole(user.role);
+      // setSelectedUserSuscriptions(user.suscripcions[0]);
+      // setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      // setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
+      // setShowModal(true);
     };
 
     const handleDeleteUser = async (userId: string) => {
@@ -118,6 +118,7 @@ const UsersPage: React.FC = () => {
             <tr>
               <th>Nombre de usuario</th>
               <th>Email</th>
+              <th>Rol</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -126,9 +127,10 @@ const UsersPage: React.FC = () => {
               <tr key={user.email}>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
+                <td>{user.role ? user.role.name : "RoleDeleted"}</td>
                 <td>
                   <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
-                  <Button variant="danger" onClick={() => handleDeleteUser(user._id)}>Eliminar</Button>
+                  <Button variant="danger" onClick={() => handleDeleteUser(user.id!)}>Eliminar</Button>
                 </td>
               </tr>
             ))}

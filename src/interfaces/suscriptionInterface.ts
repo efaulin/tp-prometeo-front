@@ -20,9 +20,9 @@ export class SuscriptionPrice {
         this.id = _id;
         this.startDate = new Date(startDate);
         this.amount = amount;
-        this.suscripcionId = Suscription.New(suscripcionId);
+        this.suscripcionId = Suscription.Parse(suscripcionId);
     }
-
+    
     public getStartDate() {
         return this.startDate;
     }
@@ -35,6 +35,9 @@ export class SuscriptionPrice {
         return this.suscripcionId;
     }
 
+    /**
+     * Devuelve un Object valido para enviar en las peticiones al servidor API Rest.
+     */
     public toAPI() {
         return {
             startDate: this.startDate.toISOString(),
@@ -48,17 +51,28 @@ export class Suscription {
     readonly id?: string;
     public type: string;
 
+    /**
+     * Utilizar unicamente para crear objetos nuevos, para su uso en peticiones HTTP utilizar el metodo de clase **Parse**(data).
+     */
     constructor({_id, type}:SuscriptionInterface) {
         this.id = _id;
         this.type = type;
     }
 
-    //TODO Testear esto
-    static New({_id, type}:SuscriptionInterface): Suscription | null {
-        if (!type) return null;
-        return new Suscription({_id, type});
+    /**
+     * Con lo recibido de la peticion HTTP, devuelve un objeto con los tipos de objetos correctos para su manejo en el UI
+     * @param data 
+     * @returns 
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static Parse(data:any): Suscription | null {
+        if (data && typeof data === "object" && "type" in data) return null;
+        return new Suscription({_id: data._id, type: data.type});
     }
 
+    /**
+     * Devuelve un Object valido para enviar en las peticiones al servidor API Rest.
+     */
     public toAPI() {
         return {
             type: this.type,

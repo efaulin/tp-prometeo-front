@@ -27,7 +27,7 @@ export class UserSuscription {
         this.id = _id;
         this.startDate = new Date(startDate);
         this.endDate = new Date(endDate);
-        this.suscripcionId = Suscription.New(suscripcionId);
+        this.suscripcionId = Suscription.Parse(suscripcionId);
     }
 
     public getStartDate() {
@@ -41,12 +41,14 @@ export class UserSuscription {
     public getSuscription() {
         return this.suscripcionId;
     }
-
+    /**
+     * Devuelve un Object valido para enviar en las peticiones al servidor API Rest.
+     */
     public toAPI() {
         return {
             startDate: this.startDate.toISOString(),
             endDate: this.endDate.toISOString(),
-            suscripcionId: this.suscripcionId!.id,
+            suscripcionId: this.suscripcionId!.id!,
         };
     }
 }
@@ -64,7 +66,7 @@ export class User {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.role = Role.New(role);
+        this.role = Role.Parse(role);
         this.suscripcions = suscripcions.map(usrScr => new UserSuscription(usrScr));
     }
 
