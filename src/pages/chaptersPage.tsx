@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import NavBar from './Navbar';
-import { idiomaInterface as LanguageInterface }  from '../interfaces/idiomaInterface' ;
-import { narradorInterface as NarratorInterface } from '../interfaces/narradorInterface';
-import { AuthorInterface } from '../interfaces/authorInterface';
-import { HostInterface } from '../interfaces/hostInterface';
-import { CollectionInterface } from '../interfaces/collectionInterface';
-import { ChapterInterface } from '../interfaces/chapterInterface';
+import { LanguageInterface }  from '../entities/languageEntity' ;
+import { NarratorInterface } from '../entities/narratorEntity';
+import { AuthorInterface } from '../entities/authorEntity';
+import { HostInterface } from '../entities/hostEntity';
+import { CollectionInterface } from '../entities/collectionEntity';
+import { ChapterInterface } from '../entities/chapterEntity';
 
 const ChaptersPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);

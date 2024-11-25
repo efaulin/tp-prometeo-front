@@ -1,7 +1,7 @@
-import { Author, AuthorInterface } from "./authorInterface";
-import { Host, HostInterface } from "./hostInterface";
-import { Language, LanguageInterface } from "./idiomaInterface";
-import { Narrator, NarratorInterface } from "./narradorInterface";
+import { Author, AuthorInterface } from "./authorEntity";
+import { Host, HostInterface } from "./hostEntity";
+import { Language, LanguageInterface } from "./languageEntity";
+import { Narrator, NarratorInterface } from "./narratorEntity";
 
 export interface ChapterInterface {
     _id: string;

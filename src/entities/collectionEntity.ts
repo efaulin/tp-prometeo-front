@@ -1,4 +1,4 @@
-import { Category, CategoryInterface } from "./categoryInterface";
+import { Category, CategoryInterface } from "./categoryEntity";
 
 export interface CollectionInterface {
     _id: string;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { User, UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
-import { RoleInterface } from '../interfaces/roleInterface';
+import { User, UserInterface, UserSuscriptionInterface } from '../entities/userEntity'; 
+import { RoleInterface } from '../entities/roleEntity';
 import NavBar from './Navbar';
-import { SuscriptionInterface } from '../interfaces/suscriptionInterface';
+import { SuscriptionInterface } from '../entities/suscriptionEntity';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);

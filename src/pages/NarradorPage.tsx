@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import NavBar from './Navbar';
-import { narradorInterface } from '../interfaces/narradorInterface';
+import { narradorInterface } from '../entities/narratorEntity';
 
 const NarradorPage: React.FC = () => {
     const [narrador, setNarrador] = useState<narradorInterface[]>([]);

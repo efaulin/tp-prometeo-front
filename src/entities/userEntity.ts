@@ -1,5 +1,5 @@
-import { Role, RoleInterface } from "./roleInterface";
-import { Suscription, SuscriptionInterface } from "./suscriptionInterface";
+import { Role, RoleInterface } from "./roleEntity";
+import { Suscription, SuscriptionInterface } from "./suscriptionEntity";
 
 export interface UserSuscriptionInterface {
     _id?: string;
