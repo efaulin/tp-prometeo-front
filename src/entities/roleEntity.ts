@@ -10,10 +10,16 @@ export class Role {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name}:RoleInterface) {
-        this.id = _id;
-        this.name = name;
+    constructor(role?:RoleInterface) {
+        if (!role) {
+            this.id = undefined;
+            this.name = "";
+        } else {
+            this.id = role._id;
+            this.name = role.name;
+        }
     }
+
     //TODO Hacer un metodo Parce(data) para todos los objetos que vengan de la API.
     //[X] Funciona!
     /**

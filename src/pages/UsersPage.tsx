@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { User, UserInterface, UserSuscriptionInterface } from '../entities/userEntity'; 
-import { RoleInterface } from '../entities/roleEntity';
+import { User, UserInterface, UserSuscription, UserSuscriptionInterface } from '../entities/userEntity'; 
+import { Role, RoleInterface } from '../entities/roleEntity';
 import NavBar from './Navbar';
-import { SuscriptionInterface } from '../entities/suscriptionEntity';
+import { Suscription, SuscriptionInterface } from '../entities/suscriptionEntity';
+import { UserRepository } from '../repositories/UserRepository.ts';
+import { SuscriptionRepository } from '../repositories/SuscriptionRepository.ts';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const [suscriptions, setSuscriptions] = useState<SuscriptionInterface[]>([]);
+    const [suscriptions, setSuscriptions] = useState<Suscription[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
-    const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
-    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface | null>(null);
+    const [selectedUser, setSelectedUser] = useState<User>(new User());
+    const [userRole, setSelectedUserRole] = useState<Role | null>(new Role({_id:"0", name:"tmp"}));
+    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscription>(new UserSuscription());
+    const [userSuscriptionId, setSelectedUserSuscriptionId] = useState<string>("");
     const [fecha, setFecha] = useState<string>("");
     const [fechaFinish, setFechaFinish] = useState<string>("");
 
@@ -30,82 +33,69 @@ const UsersPage: React.FC = () => {
     }, []);
   
     const fetchUsers = async () => {
-      const response = await axiosInstance.get('/usuario');
-      setUsers((response.data as UserInterface[]).map(usr => new User(usr)));
+      setUsers(await UserRepository.GetAll());
     };
 
     const fetchSuscriptions = async () => {
-      const response = await axiosInstance.get('/suscripcion');
-      setSuscriptions(response.data);
+      setSuscriptions(await SuscriptionRepository.GetAll());
     };
     
     const handleAddUser = () => {
-      // setSelectedUser({
-      //   _id: "0",
-      //   username: "",
-      //   email: "",
-      //   role: users[0].role,
-      //   suscripcions: users[0].suscripcions,
-      // } as UserInterface); // Limpiar selección para añadir
-      // setShowModal(true);
+      setSelectedUser(new User()); // Limpiar selección para añadir
+      setShowModal(true);
     };
   
     const handleEditUser = (user: User) => {
-      // setSelectedUser(user); // Seleccionar usuario para editar
-      // setSelectedUserRole(user.role);
-      // setSelectedUserSuscriptions(user.suscripcions[0]);
-      // setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
-      // setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
-      // setShowModal(true);
+      setSelectedUser(user); // Seleccionar usuario para editar
+      setSelectedUserRole(user.role);
+      //TODO Falta implementar el manejo de suscripciones, se parchea para pasar las validaciones del back.
+      setSelectedUserSuscriptions(user.suscripcions[0]);
+      setFecha(`${user.suscripcions[0].startDate.getFullYear()}-${String(user.suscripcions[0].startDate.getMonth() + 1).padStart(2, '0')}-${String(user.suscripcions[0].startDate.getDate()).padStart(2, '0')}T${String(user.suscripcions[0].startDate.getHours()).padStart(2, '0')}:${String(user.suscripcions[0].startDate.getMinutes()).padStart(2, '0')}`)
+      setFechaFinish(`${user.suscripcions[0].endDate.getFullYear()}-${String(user.suscripcions[0].endDate.getMonth() + 1).padStart(2, '0')}-${String(user.suscripcions[0].endDate.getDate()).padStart(2, '0')}T${String(user.suscripcions[0].endDate.getHours()).padStart(2, '0')}:${String(user.suscripcions[0].endDate.getMinutes()).padStart(2, '0')}`);
+      console.log(user);
+      console.log(user.suscripcions[0]);
+      console.log(userSuscriptions);
+      setShowModal(true);
     };
 
     const handleDeleteUser = async (userId: string) => {
-      await axiosInstance.delete(`/usuario/${userId}`);
+      await UserRepository.Delete(userId);
       fetchUsers();
     };
   
     const handleSubmit = async (event: React.FormEvent) => {
+      //TODO Cambiar los eventos del modal y aplicar los cambios aca o en "applyingCahnges()". Problemas al usar "onChange()".
       event.preventDefault();
+      applyingChanges();
       console.log(selectedUser);
-      if (selectedUser!._id != "0") {
+      if (selectedUser?.id) {
         // Editar usuario
-        const updUser = {
-          username: selectedUser!.username,
-          password: selectedUser!.password,
-          email: selectedUser!.email,
-          role: userRole?._id,
-          suscripcions: [
-            {
-              startDate: new Date(fecha).toISOString(),
-              endDate: new Date(fechaFinish).toISOString(),
-              suscripcionId: userSuscriptions?.suscripcionId._id,
-            }
-          ],
-        }
-        console.log("updUsr: ");
-        console.log(updUser);
-        const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
+        console.log("Pre-UpdateUsr:");
+        console.log(selectedUser);
+        const result = await UserRepository.Update(selectedUser!);
+        console.log("UpdateUsr:");
         console.log(result);
-        fetchUsers();
       } else {
         // Añadir usuario
-        const newUser = {
-          username: selectedUser!.username,
-          password: selectedUser!.password,
-          email: selectedUser!.email,
-          role: userRole?._id,
-          suscripcions: [
-            {
-              startDate: new Date(fecha).toISOString(),
-              endDate: new Date(fechaFinish).toISOString(),
-              suscripcionId: userSuscriptions?.suscripcionId._id,
-            }
-          ],
-        }
-        await axiosInstance.post('/usuario', newUser);
+        console.log("Pre-CreateUsr:");
+        console.log(selectedUser);
+        const result = await UserRepository.Create(selectedUser!);
+        console.log("CreateUsr:");
+        console.log(result);
       }
       setShowModal(false);
       fetchUsers();
+    };
+
+    const applyingChanges = () => {
+      selectedUser.role = userRole;
+      const tmpScrp = new Suscription({_id:userSuscriptionId, type:"xd"});
+      const newUsrScrp = new UserSuscription(undefined, new Date(fecha), new Date(fechaFinish), tmpScrp);
+      console.log("scrpId: "+ userSuscriptionId +" - tmpScrp:");
+      console.log(tmpScrp);
+      console.log("newUsrScrp:");
+      console.log(newUsrScrp);
+      selectedUser.suscripcions[0] = newUsrScrp;
     };
   
     return (
@@ -140,7 +130,7 @@ const UsersPage: React.FC = () => {
         {/* Modal para añadir o editar usuario */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header closeButton>
-            <Modal.Title>{selectedUser ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+            <Modal.Title>{selectedUser.id ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form onSubmit={handleSubmit}>
@@ -149,8 +139,11 @@ const UsersPage: React.FC = () => {
                 <Form.Control
                   required
                   type="text"
-                  value={selectedUser?.username || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value } as UserInterface)}
+                  value={selectedUser.username || ''}
+                  onChange={(e) => {
+                    selectedUser.username = e.target.value;
+                    //setSelectedUser({ ...selectedUser, username:  } as UserInterface)
+                  }}
                 />
               </Form.Group>
               <Form.Group controlId="formPass">
@@ -158,8 +151,11 @@ const UsersPage: React.FC = () => {
                 <Form.Control
                   required
                   type="password"
-                  value={selectedUser?.password || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, password: e.target.value } as UserInterface)}
+                  value={selectedUser.password || ''}
+                  onChange={(e) => {
+                    selectedUser.password = e.target.value;
+                    //setSelectedUser({ ...selectedUser, password: e.target.value } as UserInterface)
+                  }}
                 />
               </Form.Group>
               <Form.Group controlId="formEmail">
@@ -167,13 +163,16 @@ const UsersPage: React.FC = () => {
                 <Form.Control
                   required
                   type="email"
-                  value={selectedUser?.email || ''}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)}
+                  value={selectedUser.email || ''}
+                  onChange={(e) => {
+                    selectedUser.email = e.target.value;
+                    //setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)
+                  }}
                 />
               </Form.Group>
               <Form.Group controlId="formRole">
                 <Form.Label>Tipo de usuario</Form.Label>
-                <Form.Select aria-label="Seleccione rol del usuario" value={userRole ? userRole._id : ""} required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
+                <Form.Select aria-label="Seleccione rol del usuario" value={userRole?.id} required onChange={(e) => setSelectedUserRole(new Role({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface))}>
                   <option value="673124570945b0b475fe07c8">admin</option>
                   <option value="67327c62f40be4d6fc0933ae">client</option>
                 </Form.Select>
@@ -181,9 +180,9 @@ const UsersPage: React.FC = () => {
               <br/>
               <Form.Group controlId="formSuscripcionId">
                 <Form.Label>Suscripcion inicial</Form.Label>
-                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions ? userSuscriptions.suscripcionId._id : ""} required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
+                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions.suscripcion?.id} required onChange={(e) => setSelectedUserSuscriptionId(e.target.value)}>
                 {suscriptions.map((scp) => (
-                  <option value={scp._id}>{scp.type}</option>
+                  <option value={scp.id!}>{scp.type}</option>
                 ))}
                 </Form.Select>
               </Form.Group>
