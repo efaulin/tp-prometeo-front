@@ -7,6 +7,7 @@ import NavBar from './Navbar';
 import { Suscription, SuscriptionInterface } from '../entities/suscriptionEntity';
 import { UserRepository } from '../repositories/UserRepository.ts';
 import { SuscriptionRepository } from '../repositories/SuscriptionRepository.ts';
+import { UserDataModal } from '../components/userModal.tsx';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -63,6 +64,10 @@ const UsersPage: React.FC = () => {
       fetchUsers();
     };
   
+    const handleSave = (user:User) => {
+      //Do something
+    }
+
     const handleSubmit = async (event: React.FormEvent) => {
       //TODO Cambiar los eventos del modal y aplicar los cambios aca o en "applyingCahnges()". Problemas al usar "onChange()".
       event.preventDefault();
@@ -128,99 +133,12 @@ const UsersPage: React.FC = () => {
         </Table>
   
         {/* Modal para añadir o editar usuario */}
-        <Modal show={showModal} onHide={() => setShowModal(false)}>
-          <Modal.Header closeButton>
-            <Modal.Title>{selectedUser.id ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formName">
-                <Form.Label>Nombre de usuario</Form.Label>
-                <Form.Control
-                  required
-                  type="text"
-                  value={selectedUser.username || ''}
-                  onChange={(e) => {
-                    selectedUser.username = e.target.value;
-                    //setSelectedUser({ ...selectedUser, username:  } as UserInterface)
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formPass">
-                <Form.Label>Contraseña</Form.Label>
-                <Form.Control
-                  required
-                  type="password"
-                  value={selectedUser.password || ''}
-                  onChange={(e) => {
-                    selectedUser.password = e.target.value;
-                    //setSelectedUser({ ...selectedUser, password: e.target.value } as UserInterface)
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  required
-                  type="email"
-                  value={selectedUser.email || ''}
-                  onChange={(e) => {
-                    selectedUser.email = e.target.value;
-                    //setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)
-                  }}
-                />
-              </Form.Group>
-              <Form.Group controlId="formRole">
-                <Form.Label>Tipo de usuario</Form.Label>
-                <Form.Select aria-label="Seleccione rol del usuario" value={userRole?.id} required onChange={(e) => setSelectedUserRole(new Role({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface))}>
-                  <option value="673124570945b0b475fe07c8">admin</option>
-                  <option value="67327c62f40be4d6fc0933ae">client</option>
-                </Form.Select>
-              </Form.Group>
-              <br/>
-              <Form.Group controlId="formSuscripcionId">
-                <Form.Label>Suscripcion inicial</Form.Label>
-                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions.suscripcion?.id} required onChange={(e) => setSelectedUserSuscriptionId(e.target.value)}>
-                {suscriptions.map((scp) => (
-                  <option value={scp.id!}>{scp.type}</option>
-                ))}
-                </Form.Select>
-              </Form.Group>
-              <Form.Group controlId="formStartDate">
-                <Form.Label>Fecha inico</Form.Label>
-                <Row>
-                <label>
-                    Selecciona una fecha Inicial:
-                    <input 
-                        type="datetime-local" 
-                        value={fecha} 
-                        onChange={handleFechaChange} 
-                        required 
-                    />
-                </label>
-                </Row>
-              </Form.Group>
-              <Form.Group controlId="formEndDate">
-                <Form.Label>Fecha fin</Form.Label>
-                <Row>
-                  <label>
-                      Selecciona una fecha Final:
-                      <input 
-                          type="datetime-local" 
-                          value={fechaFinish}
-                          onChange={handleFechaFinishChange} 
-                          required 
-                      />
-                  </label>
-                </Row>
-              </Form.Group>
-              <br/>
-              <Button variant="primary" type="submit">
-                {selectedUser ? 'Guardar cambios' : 'Agregar'}
-              </Button>
-            </Form>
-          </Modal.Body>
-        </Modal>
+        <UserDataModal
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          handleSave={handleSave}
+          initialData={selectedUser}
+        />
       </div>
     );
   };
