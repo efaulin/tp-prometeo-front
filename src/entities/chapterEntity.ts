@@ -36,40 +36,53 @@ export class Chapter {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor(chapter:ChapterInterface) {
-        this.id = chapter._id;
-        this.name = chapter.name;
-        this.collectionId = chapter.collectionRef;
-        this.durationInSeconds = chapter.durationInSeconds;
-        this.description = chapter.description;
-        this.uploadDate = new Date(chapter.uploadDate);
-        this.publicationDate = new Date(chapter.publicationDate);
-        this.languageRef = Language.Parse(chapter.languageRef);
+    constructor(chapter?:ChapterInterface) {
+        if (chapter) {
+            this.id = chapter._id;
+            this.name = chapter.name;
+            this.collectionId = chapter.collectionRef;
+            this.durationInSeconds = chapter.durationInSeconds;
+            this.description = chapter.description;
+            this.uploadDate = new Date(chapter.uploadDate);
+            this.publicationDate = new Date(chapter.publicationDate);
+            this.languageRef = Language.Parse(chapter.languageRef);
 
-        //Podcast -> Hosts
-        //Audiolibro -> Authors & Narrator
-        if (chapter.hostsRef.length > 0) {
-            const tmpHosts:Host[] = [];
-            chapter.hostsRef.forEach((hst) => {
-                const tmp = Host.Parse(hst);
-                if (tmp) {
-                    tmpHosts.push(tmp);
-                }
-            });
-            this.hostsRef = tmpHosts;
+            //Podcast -> Hosts
+            //Audiolibro -> Authors & Narrator
+            if (chapter.hostsRef.length > 0) {
+                const tmpHosts:Host[] = [];
+                chapter.hostsRef.forEach((hst) => {
+                    const tmp = Host.Parse(hst);
+                    if (tmp) {
+                        tmpHosts.push(tmp);
+                    }
+                });
+                this.hostsRef = tmpHosts;
+                this.authorsRef = null;
+                this.narratorRef = null;
+            } else {
+                const tmpAuthors:Author[] = [];
+                chapter.authorsRef.forEach((ath) => {
+                    const tmp = Author.Parse(ath);
+                    if (tmp) {
+                        tmpAuthors.push(tmp);
+                    }
+                });
+                this.authorsRef = tmpAuthors;
+                this.narratorRef = Narrator.Parse(chapter.narratorRef);
+                this.hostsRef = null;
+            }
+        } else {
+            this.name = "";
+            this.collectionId = "";
+            this.durationInSeconds = 0;
+            this.description = "";
+            this.uploadDate = new Date();
+            this.publicationDate = new Date();
+            this.languageRef = null;
+            this.hostsRef = null;
             this.authorsRef = null;
             this.narratorRef = null;
-        } else {
-            const tmpAuthors:Author[] = [];
-            chapter.authorsRef.forEach((ath) => {
-                const tmp = Author.Parse(ath);
-                if (tmp) {
-                    tmpAuthors.push(tmp);
-                }
-            });
-            this.authorsRef = tmpAuthors;
-            this.narratorRef = Narrator.Parse(chapter.narratorRef);
-            this.hostsRef = null;
         }
     }
     

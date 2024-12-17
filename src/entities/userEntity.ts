@@ -85,4 +85,18 @@ export class User {
             subscriptionsRef: this.subscriptions.map(usrScr => usrScr.toAPI()),
         };
     }
+
+    /**
+     * Con lo recibido de la peticion HTTP, devuelve un objeto con los tipos de objetos correctos para su manejo en el UI.
+     * Usar para las refrencias.
+     * @param data 
+     * @returns 
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static Parse(data:any): User | null {
+        if (data && typeof data === "object" && "username" in data) {
+            return new User(data);
+        }
+        return null;
+    }
 }
