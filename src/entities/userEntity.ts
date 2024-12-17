@@ -1,11 +1,11 @@
 import { Role, RoleInterface } from "./roleEntity";
-import { Suscription, SuscriptionInterface } from "./suscriptionEntity";
+import { Subscription, SubscriptionInterface } from "./subscriptionEntity";
 
-export interface UserSuscriptionInterface {
+export interface UserSubscriptionInterface {
     _id?: string;
     startDate: string;
     endDate: string;
-    suscripcionId: SuscriptionInterface;
+    subscriptionRef: SubscriptionInterface;
 }
 
 export interface UserInterface {
@@ -13,28 +13,28 @@ export interface UserInterface {
     username: string;
     password: string;
     email: string;
-    role: RoleInterface;
-    suscripcions: UserSuscriptionInterface[];
+    roleRef: RoleInterface;
+    subscriptionsRef: UserSubscriptionInterface[];
 }
 
-export class UserSuscription {
+export class UserSubscription {
     readonly startDate: Date;
     readonly endDate: Date;
-    readonly suscripcion: Suscription | null;
+    readonly subscription: Subscription | null;
 
-    constructor(usrScr?:UserSuscriptionInterface, startDate?:Date, endDate?:Date, suscription?:Suscription) {
+    constructor(usrScr?:UserSubscriptionInterface, startDate?:Date, endDate?:Date, subscription?:Subscription) {
         if (usrScr) {
             this.startDate = new Date(usrScr.startDate);
             this.endDate = new Date(usrScr.endDate);
-            this.suscripcion = Suscription.Parse(usrScr.suscripcionId);
-        } else if (startDate && endDate && suscription) {
+            this.subscription = Subscription.Parse(usrScr.subscriptionRef);
+        } else if (startDate && endDate && subscription) {
             this.startDate = startDate;
             this.endDate = endDate;
-            this.suscripcion = suscription;
+            this.subscription = subscription;
         } else {
             this.startDate = new Date();
             this.endDate = new Date();
-            this.suscripcion = null;
+            this.subscription = null;
         }
     }
     
@@ -45,7 +45,7 @@ export class UserSuscription {
         return {
             startDate: this.startDate.toISOString(),
             endDate: this.endDate.toISOString(),
-            suscripcionId: this.suscripcion!.id!,
+            subscriptionRef: this.subscription!.id!,
         };
     }
 }
@@ -56,7 +56,7 @@ export class User {
     public password: string;
     public email: string;
     public role: Role | null;
-    public suscripcions: UserSuscription[];
+    public subscriptions: UserSubscription[];
 
     constructor(user?:UserInterface) {
         if (user) {
@@ -64,15 +64,15 @@ export class User {
             this.username = user.username;
             this.password = user.password;
             this.email = user.email;
-            this.role = Role.Parse(user.role);
-            this.suscripcions = user.suscripcions.map(usrScr => new UserSuscription(usrScr));
+            this.role = Role.Parse(user.roleRef);
+            this.subscriptions = user.subscriptionsRef.map(usrScr => new UserSubscription(usrScr));
         } else {
             this.id = undefined;
             this.username = "";
             this.password = "";
             this.email = "";
             this.role = null;
-            this.suscripcions = [];
+            this.subscriptions = [];
         }
     }
 
@@ -81,8 +81,22 @@ export class User {
             username: this.username,
             password: this.password,
             email: this.email,
-            role: this.role!.id!,
-            suscripcions: this.suscripcions.map(usrScr => usrScr.toAPI()),
+            roleRef: this.role!.id!,
+            subscriptionsRef: this.subscriptions.map(usrScr => usrScr.toAPI()),
         };
+    }
+
+    /**
+     * Con lo recibido de la peticion HTTP, devuelve un objeto con los tipos de objetos correctos para su manejo en el UI.
+     * Usar para las refrencias.
+     * @param data 
+     * @returns 
+     */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static Parse(data:any): User | null {
+        if (data && typeof data === "object" && "username" in data) {
+            return new User(data);
+        }
+        return null;
     }
 }

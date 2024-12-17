@@ -1,22 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { User, UserInterface, UserSuscription, UserSuscriptionInterface } from '../entities/userEntity'; 
+import { User, UserInterface, UserSubscription, UserSubscriptionInterface } from '../entities/userEntity'; 
 import { Role, RoleInterface } from '../entities/roleEntity';
 import NavBar from './Navbar';
-import { Suscription, SuscriptionInterface } from '../entities/suscriptionEntity';
-import { UserRepository } from '../repositories/UserRepository.ts';
-import { SuscriptionRepository } from '../repositories/SuscriptionRepository.ts';
-import { UserDataModal } from '../components/userModal.tsx';
+import { Subscription, SubscriptionInterface } from '../entities/subscriptionEntity';
+import { UserRepository } from '../repositories/UserRepository';
+import { SubscriptionRepository } from '../repositories/SubscriptionRepository';
+import { UserDataModal } from '../components/userModal';
 
 const UsersPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
-    const [suscriptions, setSuscriptions] = useState<Suscription[]>([]);
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User>(new User());
     const [userRole, setSelectedUserRole] = useState<Role | null>(new Role({_id:"0", name:"tmp"}));
-    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscription>(new UserSuscription());
-    const [userSuscriptionId, setSelectedUserSuscriptionId] = useState<string>("");
+    const [userSubscriptions, setSelectedUserSubscriptions] = useState<UserSubscription>(new UserSubscription());
+    const [userSubscriptionId, setSelectedUserSubscriptionId] = useState<string>("");
     const [fecha, setFecha] = useState<string>("");
     const [fechaFinish, setFechaFinish] = useState<string>("");
 
@@ -30,15 +30,15 @@ const UsersPage: React.FC = () => {
     // Obtener usuarios al cargar la página
     useEffect(() => {
       fetchUsers();
-      fetchSuscriptions()
+      fetchSubscriptions()
     }, []);
   
     const fetchUsers = async () => {
       setUsers(await UserRepository.GetAll());
     };
 
-    const fetchSuscriptions = async () => {
-      setSuscriptions(await SuscriptionRepository.GetAll());
+    const fetchSubscriptions = async () => {
+      setSubscriptions(await SubscriptionRepository.GetAll());
     };
     
     const handleAddUser = () => {
@@ -49,13 +49,13 @@ const UsersPage: React.FC = () => {
     const handleEditUser = (user: User) => {
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
-      //TODO Falta implementar el manejo de suscripciones, se parchea para pasar las validaciones del back.
-      setSelectedUserSuscriptions(user.suscripcions[0]);
-      setFecha(`${user.suscripcions[0].startDate.getFullYear()}-${String(user.suscripcions[0].startDate.getMonth() + 1).padStart(2, '0')}-${String(user.suscripcions[0].startDate.getDate()).padStart(2, '0')}T${String(user.suscripcions[0].startDate.getHours()).padStart(2, '0')}:${String(user.suscripcions[0].startDate.getMinutes()).padStart(2, '0')}`)
-      setFechaFinish(`${user.suscripcions[0].endDate.getFullYear()}-${String(user.suscripcions[0].endDate.getMonth() + 1).padStart(2, '0')}-${String(user.suscripcions[0].endDate.getDate()).padStart(2, '0')}T${String(user.suscripcions[0].endDate.getHours()).padStart(2, '0')}:${String(user.suscripcions[0].endDate.getMinutes()).padStart(2, '0')}`);
+      //TODO Falta implementar el manejo de subscriptiones, se parchea para pasar las validaciones del back.
+      setSelectedUserSubscriptions(user.subscriptions[0]);
+      setFecha(`${user.subscriptions[0].startDate.getFullYear()}-${String(user.subscriptions[0].startDate.getMonth() + 1).padStart(2, '0')}-${String(user.subscriptions[0].startDate.getDate()).padStart(2, '0')}T${String(user.subscriptions[0].startDate.getHours()).padStart(2, '0')}:${String(user.subscriptions[0].startDate.getMinutes()).padStart(2, '0')}`)
+      setFechaFinish(`${user.subscriptions[0].endDate.getFullYear()}-${String(user.subscriptions[0].endDate.getMonth() + 1).padStart(2, '0')}-${String(user.subscriptions[0].endDate.getDate()).padStart(2, '0')}T${String(user.subscriptions[0].endDate.getHours()).padStart(2, '0')}:${String(user.subscriptions[0].endDate.getMinutes()).padStart(2, '0')}`);
       console.log(user);
-      console.log(user.suscripcions[0]);
-      console.log(userSuscriptions);
+      console.log(user.subscriptions[0]);
+      console.log(userSubscriptions);
       setShowModal(true);
     };
 
@@ -94,13 +94,13 @@ const UsersPage: React.FC = () => {
 
     const applyingChanges = () => {
       selectedUser.role = userRole;
-      const tmpScrp = new Suscription({_id:userSuscriptionId, type:"xd"});
-      const newUsrScrp = new UserSuscription(undefined, new Date(fecha), new Date(fechaFinish), tmpScrp);
-      console.log("scrpId: "+ userSuscriptionId +" - tmpScrp:");
+      const tmpScrp = new Subscription({_id:userSubscriptionId, type:"xd"});
+      const newUsrScrp = new UserSubscription(undefined, new Date(fecha), new Date(fechaFinish), tmpScrp);
+      console.log("scrpId: "+ userSubscriptionId +" - tmpScrp:");
       console.log(tmpScrp);
       console.log("newUsrScrp:");
       console.log(newUsrScrp);
-      selectedUser.suscripcions[0] = newUsrScrp;
+      selectedUser.subscriptions[0] = newUsrScrp;
     };
   
     return (
