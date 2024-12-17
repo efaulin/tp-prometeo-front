@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import NavBar from './Navbar';
-import { LanguageInterface }  from '../entities/languageEntity' ;
-import { NarratorInterface } from '../entities/narratorEntity';
-import { AuthorInterface } from '../entities/authorEntity';
-import { HostInterface } from '../entities/hostEntity';
-import { CollectionInterface } from '../entities/collectionEntity';
-import { ChapterInterface } from '../entities/chapterEntity';
+import { idiomaInterface as LanguageInterface }  from '../interfaces/idiomaInterface' ;
+import { narradorInterface as NarratorInterface } from '../interfaces/narradorInterface';
+import { AuthorInterface } from '../interfaces/authorInterface';
+import { HostInterface } from '../interfaces/hostInterface';
+import { CollectionInterface } from '../interfaces/collectionInterface';
+import { ChapterInterface } from '../interfaces/chapterInterface';
 
 const ChaptersPage: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
@@ -107,8 +107,8 @@ const ChaptersPage: React.FC = () => {
         setSelectedAuthors(chapter.authors);
         setSelectedNarrator(chapter.narrator);
       }
-      //setFecha(`${new Date(user.subscriptions[0].startDate).getFullYear()}-${String(new Date(user.subscriptions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.subscriptions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.subscriptions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.subscriptions[0].startDate).getMinutes()).padStart(2, '0')}`)
-      //setFechaFinish(`${new Date(user.subscriptions[0].endDate).getFullYear()}-${String(new Date(user.subscriptions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.subscriptions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.subscriptions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.subscriptions[0].endDate).getMinutes()).padStart(2, '0')}`);
+      //setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      //setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
       fetchChapters();
     };

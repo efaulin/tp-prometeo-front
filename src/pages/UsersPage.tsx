@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import { User, UserInterface, UserSubscription, UserSubscriptionInterface } from '../entities/userEntity'; 
-import { Role, RoleInterface } from '../entities/roleEntity';
+import { UserInterface, UserSuscriptionInterface } from '../interfaces/userInterface'; 
+import { RoleInterface } from '../interfaces/roleInterface';
 import NavBar from './Navbar';
-import { Subscription, SubscriptionInterface } from '../entities/subscriptionEntity';
-import { UserRepository } from '../repositories/UserRepository';
-import { SubscriptionRepository } from '../repositories/SubscriptionRepository';
-import { UserDataModal } from '../components/userModal';
+import { SuscriptionInterface } from '../interfaces/suscriptionInterface';
 
 const UsersPage: React.FC = () => {
-    const [users, setUsers] = useState<User[]>([]);
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [users, setUsers] = useState<UserInterface[]>([]);
+    const [suscriptions, setSuscriptions] = useState<SuscriptionInterface[]>([]);
     const [showModal, setShowModal] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<User>(new User());
-    const [userRole, setSelectedUserRole] = useState<Role | null>(new Role({_id:"0", name:"tmp"}));
-    const [userSubscriptions, setSelectedUserSubscriptions] = useState<UserSubscription>(new UserSubscription());
-    const [userSubscriptionId, setSelectedUserSubscriptionId] = useState<string>("");
+    const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
+    const [userRole, setSelectedUserRole] = useState<RoleInterface | null>({_id:"0", name:"tmp"});
+    const [userSuscriptions, setSelectedUserSuscriptions] = useState<UserSuscriptionInterface | null>(null);
     const [fecha, setFecha] = useState<string>("");
     const [fechaFinish, setFechaFinish] = useState<string>("");
 
@@ -30,77 +26,86 @@ const UsersPage: React.FC = () => {
     // Obtener usuarios al cargar la página
     useEffect(() => {
       fetchUsers();
-      fetchSubscriptions()
+      fetchSuscriptions()
     }, []);
   
     const fetchUsers = async () => {
-      setUsers(await UserRepository.GetAll());
+      const response = await axiosInstance.get('/usuario');
+      setUsers(response.data);
     };
 
-    const fetchSubscriptions = async () => {
-      setSubscriptions(await SubscriptionRepository.GetAll());
+    const fetchSuscriptions = async () => {
+      const response = await axiosInstance.get('/suscripcion');
+      setSuscriptions(response.data);
     };
-    
+    //TODO Probar no se haya roto create
     const handleAddUser = () => {
-      setSelectedUser(new User()); // Limpiar selección para añadir
+      setSelectedUser({
+        _id: "0",
+        username: "",
+        email: "",
+        role: users[0].role,
+        suscripcions: users[0].suscripcions,
+      } as UserInterface); // Limpiar selección para añadir
       setShowModal(true);
     };
   
-    const handleEditUser = (user: User) => {
+    const handleEditUser = (user: UserInterface) => {
       setSelectedUser(user); // Seleccionar usuario para editar
       setSelectedUserRole(user.role);
-      //TODO Falta implementar el manejo de subscriptiones, se parchea para pasar las validaciones del back.
-      setSelectedUserSubscriptions(user.subscriptions[0]);
-      setFecha(`${user.subscriptions[0].startDate.getFullYear()}-${String(user.subscriptions[0].startDate.getMonth() + 1).padStart(2, '0')}-${String(user.subscriptions[0].startDate.getDate()).padStart(2, '0')}T${String(user.subscriptions[0].startDate.getHours()).padStart(2, '0')}:${String(user.subscriptions[0].startDate.getMinutes()).padStart(2, '0')}`)
-      setFechaFinish(`${user.subscriptions[0].endDate.getFullYear()}-${String(user.subscriptions[0].endDate.getMonth() + 1).padStart(2, '0')}-${String(user.subscriptions[0].endDate.getDate()).padStart(2, '0')}T${String(user.subscriptions[0].endDate.getHours()).padStart(2, '0')}:${String(user.subscriptions[0].endDate.getMinutes()).padStart(2, '0')}`);
-      console.log(user);
-      console.log(user.subscriptions[0]);
-      console.log(userSubscriptions);
+      setSelectedUserSuscriptions(user.suscripcions[0]);
+      setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
     };
 
     const handleDeleteUser = async (userId: string) => {
-      await UserRepository.Delete(userId);
+      await axiosInstance.delete(`/usuario/${userId}`);
       fetchUsers();
     };
   
-    const handleSave = (user:User) => {
-      //Do something
-    }
-
     const handleSubmit = async (event: React.FormEvent) => {
-      //TODO Cambiar los eventos del modal y aplicar los cambios aca o en "applyingCahnges()". Problemas al usar "onChange()".
       event.preventDefault();
-      applyingChanges();
       console.log(selectedUser);
-      if (selectedUser?.id) {
+      if (selectedUser!._id != "0") {
         // Editar usuario
-        console.log("Pre-UpdateUsr:");
-        console.log(selectedUser);
-        const result = await UserRepository.Update(selectedUser!);
-        console.log("UpdateUsr:");
+        const updUser = {
+          username: selectedUser!.username,
+          password: selectedUser!.password,
+          email: selectedUser!.email,
+          role: userRole?._id,
+          suscripcions: [
+            {
+              startDate: new Date(fecha).toISOString(),
+              endDate: new Date(fechaFinish).toISOString(),
+              suscripcionId: userSuscriptions?.suscripcionId._id,
+            }
+          ],
+        }
+        console.log("updUsr: ");
+        console.log(updUser);
+        const result = await axiosInstance.put(`/usuario/${selectedUser!._id}`, updUser);
         console.log(result);
+        fetchUsers();
       } else {
         // Añadir usuario
-        console.log("Pre-CreateUsr:");
-        console.log(selectedUser);
-        const result = await UserRepository.Create(selectedUser!);
-        console.log("CreateUsr:");
-        console.log(result);
+        const newUser = {
+          username: selectedUser!.username,
+          password: selectedUser!.password,
+          email: selectedUser!.email,
+          role: userRole?._id,
+          suscripcions: [
+            {
+              startDate: new Date(fecha).toISOString(),
+              endDate: new Date(fechaFinish).toISOString(),
+              suscripcionId: userSuscriptions?.suscripcionId._id,
+            }
+          ],
+        }
+        await axiosInstance.post('/usuario', newUser);
       }
       setShowModal(false);
       fetchUsers();
-    };
-
-    const applyingChanges = () => {
-      selectedUser.role = userRole;
-      const tmpScrp = new Subscription({_id:userSubscriptionId, type:"xd"});
-      const newUsrScrp = new UserSubscription(undefined, new Date(fecha), new Date(fechaFinish), tmpScrp);
-      console.log("scrpId: "+ userSubscriptionId +" - tmpScrp:");
-      console.log(tmpScrp);
-      console.log("newUsrScrp:");
-      console.log(newUsrScrp);
-      selectedUser.subscriptions[0] = newUsrScrp;
     };
   
     return (
@@ -113,7 +118,6 @@ const UsersPage: React.FC = () => {
             <tr>
               <th>Nombre de usuario</th>
               <th>Email</th>
-              <th>Rol</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -122,10 +126,9 @@ const UsersPage: React.FC = () => {
               <tr key={user.email}>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
-                <td>{user.role ? user.role.name : "RoleDeleted"}</td>
                 <td>
                   <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
-                  <Button variant="danger" onClick={() => handleDeleteUser(user.id!)}>Eliminar</Button>
+                  <Button variant="danger" onClick={() => handleDeleteUser(user._id)}>Eliminar</Button>
                 </td>
               </tr>
             ))}
@@ -133,12 +136,90 @@ const UsersPage: React.FC = () => {
         </Table>
   
         {/* Modal para añadir o editar usuario */}
-        <UserDataModal
-          show={showModal}
-          handleClose={() => setShowModal(false)}
-          handleSave={handleSave}
-          initialData={selectedUser}
-        />
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+            <Modal.Title>{selectedUser ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form onSubmit={handleSubmit}>
+              <Form.Group controlId="formName">
+                <Form.Label>Nombre de usuario</Form.Label>
+                <Form.Control
+                  required
+                  type="text"
+                  value={selectedUser?.username || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value } as UserInterface)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formPass">
+                <Form.Label>Contraseña</Form.Label>
+                <Form.Control
+                  required
+                  type="password"
+                  value={selectedUser?.password || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, password: e.target.value } as UserInterface)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  required
+                  type="email"
+                  value={selectedUser?.email || ''}
+                  onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value } as UserInterface)}
+                />
+              </Form.Group>
+              <Form.Group controlId="formRole">
+                <Form.Label>Tipo de usuario</Form.Label>
+                <Form.Select aria-label="Seleccione rol del usuario" value={userRole ? userRole._id : ""} required onChange={(e) => setSelectedUserRole({ ...setSelectedUserRole, _id: e.target.value } as RoleInterface)}>
+                  <option value="673124570945b0b475fe07c8">admin</option>
+                  <option value="67327c62f40be4d6fc0933ae">client</option>
+                </Form.Select>
+              </Form.Group>
+              <br/>
+              <Form.Group controlId="formSuscripcionId">
+                <Form.Label>Suscripcion inicial</Form.Label>
+                <Form.Select aria-label="Seleccione tipo de suscripcion" value={userSuscriptions ? userSuscriptions.suscripcionId._id : ""} required onChange={(e) => setSelectedUserSuscriptions({ ...setSelectedUserSuscriptions, suscripcionId:{_id:e.target.value, type:"xd"}} as UserSuscriptionInterface)}>
+                {suscriptions.map((scp) => (
+                  <option value={scp._id}>{scp.type}</option>
+                ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group controlId="formStartDate">
+                <Form.Label>Fecha inico</Form.Label>
+                <Row>
+                <label>
+                    Selecciona una fecha Inicial:
+                    <input 
+                        type="datetime-local" 
+                        value={fecha} 
+                        onChange={handleFechaChange} 
+                        required 
+                    />
+                </label>
+                </Row>
+              </Form.Group>
+              <Form.Group controlId="formEndDate">
+                <Form.Label>Fecha fin</Form.Label>
+                <Row>
+                  <label>
+                      Selecciona una fecha Final:
+                      <input 
+                          type="datetime-local" 
+                          value={fechaFinish}
+                          onChange={handleFechaFinishChange} 
+                          required 
+                      />
+                  </label>
+                </Row>
+              </Form.Group>
+              <br/>
+              <Button variant="primary" type="submit">
+                {selectedUser ? 'Guardar cambios' : 'Agregar'}
+              </Button>
+            </Form>
+          </Modal.Body>
+        </Modal>
       </div>
     );
   };

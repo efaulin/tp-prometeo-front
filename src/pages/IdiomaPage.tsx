@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
 import NavBar from './Navbar';
-import { idiomaInterface } from '../entities/languageEntity';
+import { idiomaInterface } from '../interfaces/idiomaInterface';
 
 const IdiomaPage: React.FC = () => {
     const [idiomas, setIdiomas] = useState<idiomaInterface[]>([]);
