@@ -5,13 +5,13 @@ import { Narrator, NarratorInterface } from "./narratorEntity";
 
 export interface ChapterInterface {
     _id: string;
-    coleccionId: string;
+    collectionRef: string;
     name: string;
-    authors: AuthorInterface[];
-    narrator: NarratorInterface;
-    hosts: HostInterface[];
+    authorsRef: AuthorInterface[];
+    narratorRef: NarratorInterface;
+    hostsRef: HostInterface[];
     durationInSeconds: number;
-    language: LanguageInterface;
+    languageRef: LanguageInterface;
     description: string;
     uploadDate: Date;
     publicationDate: Date;
@@ -21,17 +21,17 @@ export class Chapter {
     //ASK ¿Todos public?
     readonly id?: string;
     public name: string;
-    public collectionID: string;
+    public collectionId: string; //Se decidio que CollectionRef devolvera unicamente su ID.
     readonly durationInSeconds: number; //Duracion del audio.
     public description: string;
     readonly uploadDate: Date; //Fecha de carga del audio
     public publicationDate: Date;
-    public language: Language | null;
+    public languageRef: Language | null;
     //Podcast -> Hosts
-    private hosts: Host[] | null;
+    private hostsRef: Host[] | null;
     //Audiolibro -> Authors & Narrator
-    private authors: Author[] | null;
-    private narrator: Narrator | null;
+    private authorsRef: Author[] | null;
+    private narratorRef: Narrator | null;
 
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
@@ -39,37 +39,37 @@ export class Chapter {
     constructor(chapter:ChapterInterface) {
         this.id = chapter._id;
         this.name = chapter.name;
-        this.collectionID = chapter.coleccionId;
+        this.collectionId = chapter.collectionRef;
         this.durationInSeconds = chapter.durationInSeconds;
         this.description = chapter.description;
         this.uploadDate = new Date(chapter.uploadDate);
         this.publicationDate = new Date(chapter.publicationDate);
-        this.language = Language.Parse(chapter.language);
+        this.languageRef = Language.Parse(chapter.languageRef);
 
         //Podcast -> Hosts
         //Audiolibro -> Authors & Narrator
-        if (chapter.hosts.length > 0) {
+        if (chapter.hostsRef.length > 0) {
             const tmpHosts:Host[] = [];
-            chapter.hosts.forEach((hst) => {
+            chapter.hostsRef.forEach((hst) => {
                 const tmp = Host.Parse(hst);
                 if (tmp) {
                     tmpHosts.push(tmp);
                 }
             });
-            this.hosts = tmpHosts;
-            this.authors = null;
-            this.narrator = null;
+            this.hostsRef = tmpHosts;
+            this.authorsRef = null;
+            this.narratorRef = null;
         } else {
             const tmpAuthors:Author[] = [];
-            chapter.authors.forEach((ath) => {
+            chapter.authorsRef.forEach((ath) => {
                 const tmp = Author.Parse(ath);
                 if (tmp) {
                     tmpAuthors.push(tmp);
                 }
             });
-            this.authors = tmpAuthors;
-            this.narrator = Narrator.Parse(chapter.narrator);
-            this.hosts = null;
+            this.authorsRef = tmpAuthors;
+            this.narratorRef = Narrator.Parse(chapter.narratorRef);
+            this.hostsRef = null;
         }
     }
     
@@ -88,41 +88,41 @@ export class Chapter {
     }
 
     public isPodcast() : boolean {
-        if (this.hosts) {
+        if (this.hostsRef) {
             return true;
         }
         return false;
     }
 
     public isAudiobook() : boolean {
-        if (this.authors && this.narrator) {
+        if (this.authorsRef && this.narratorRef) {
             return true;
         }
         return false;
     }
     
     public getHosts() {
-        return this.hosts;
+        return this.hostsRef;
     }
 
     public getAuthors() {
-        return this.authors;
+        return this.authorsRef;
     }
 
     public getNarrator() {
-        return this.narrator;
+        return this.narratorRef;
     }
 
     public setHosts(hosts:Host[]) {
-        this.hosts = hosts;
-        this.authors = null;
-        this.narrator = null;
+        this.hostsRef = hosts;
+        this.authorsRef = null;
+        this.narratorRef = null;
     }
 
     public setNarratorAndAuthors(nrt: Narrator, aths: Author[]) {
-        this.narrator = nrt;
-        this.authors = aths;
-        this.hosts = null;
+        this.narratorRef = nrt;
+        this.authorsRef = aths;
+        this.hostsRef = null;
     }
 
     /**
@@ -130,7 +130,7 @@ export class Chapter {
      * @param authors 
      */
     public setAuthors(authors:Author[]) {
-        this.setNarratorAndAuthors(this.narrator!, authors);
+        this.setNarratorAndAuthors(this.narratorRef!, authors);
     }
 
     /**
@@ -138,7 +138,7 @@ export class Chapter {
      * @param authors 
      */
     public setNarrator(narrator:Narrator) {
-        this.setNarratorAndAuthors(narrator, this.authors!);
+        this.setNarratorAndAuthors(narrator, this.authorsRef!);
     }
 
     /**
@@ -147,17 +147,17 @@ export class Chapter {
     public toAPI() {
         return {
             name: this.name,
-            coleccionId: this.collectionID,
+            collectionRef: this.collectionId,
             durationInSeconds: this.durationInSeconds,
             description: this.description,
             uploadDate: this.uploadDate.toISOString(),
             publicationDate: this.publicationDate.toISOString(),
-            language: this.language!.id!,
+            languageRef: this.languageRef!.id!,
             //Podcast -> Hosts
-            hosts: this.hosts?.map(hst => hst.id!),
+            hostsRef: this.hostsRef?.map(hst => hst.id!),
             //Audiolibro -> Authors & Narrator
-            authors: this.authors?.map(ath => ath.id!),
-            narrator: this.narrator?.id, //TODO Teastear, no me acuerdo como lo manejaba el back
+            authorsRef: this.authorsRef?.map(ath => ath.id!),
+            narratorRef: this.narratorRef?.id, //TODO Teastear, no me acuerdo como lo manejaba el back
         };
     }
 }

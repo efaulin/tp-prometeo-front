@@ -107,8 +107,8 @@ const ChaptersPage: React.FC = () => {
         setSelectedAuthors(chapter.authors);
         setSelectedNarrator(chapter.narrator);
       }
-      //setFecha(`${new Date(user.suscripcions[0].startDate).getFullYear()}-${String(new Date(user.suscripcions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].startDate).getMinutes()).padStart(2, '0')}`)
-      //setFechaFinish(`${new Date(user.suscripcions[0].endDate).getFullYear()}-${String(new Date(user.suscripcions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.suscripcions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.suscripcions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.suscripcions[0].endDate).getMinutes()).padStart(2, '0')}`);
+      //setFecha(`${new Date(user.subscriptions[0].startDate).getFullYear()}-${String(new Date(user.subscriptions[0].startDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.subscriptions[0].startDate).getDate()).padStart(2, '0')}T${String(new Date(user.subscriptions[0].startDate).getHours()).padStart(2, '0')}:${String(new Date(user.subscriptions[0].startDate).getMinutes()).padStart(2, '0')}`)
+      //setFechaFinish(`${new Date(user.subscriptions[0].endDate).getFullYear()}-${String(new Date(user.subscriptions[0].endDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(user.subscriptions[0].endDate).getDate()).padStart(2, '0')}T${String(new Date(user.subscriptions[0].endDate).getHours()).padStart(2, '0')}:${String(new Date(user.subscriptions[0].endDate).getMinutes()).padStart(2, '0')}`);
       setShowModal(true);
       fetchChapters();
     };

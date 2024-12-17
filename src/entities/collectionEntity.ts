@@ -4,31 +4,31 @@ export interface CollectionInterface {
     _id: string;
     name: string;
     description: string;
-    categories: CategoryInterface[];
+    categoriesRef: CategoryInterface[];
 }
 
 export class Collection {
     readonly id?: string;
     public name: string;
     public description: string;
-    public categories: Category[]; //¿Public?
+    public categoriesRef: Category[]; //¿Public?
 
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name, description, categories}:CollectionInterface) {
+    constructor({_id, name, description, categoriesRef}:CollectionInterface) {
         this.id = _id;
         this.name = name;
         this.description = description;
 
         const tmpCategoriesArray : Category[] = [];
-        categories.forEach((ctgInt) => {
+        categoriesRef.forEach((ctgInt) => {
             const tmpCtg = Category.Parse(ctgInt);
             if (tmpCtg) {
                 tmpCategoriesArray.push(tmpCtg);
             }
         })
-        this.categories = tmpCategoriesArray;
+        this.categoriesRef = tmpCategoriesArray;
     }
     
     /**
@@ -40,7 +40,7 @@ export class Collection {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static Parse(data:any): Collection | null {
         if (data && typeof data === "object" && "name" in data) {
-            return new Collection({_id: data._id, name:data.name, description: data.description, categories: data.categories});
+            return new Collection({_id: data._id, name:data.name, description: data.description, categoriesRef: data.categoriesRef});
         }
         return null;
     }
@@ -52,7 +52,7 @@ export class Collection {
         return {
             name: this.name,
             description: this.description,
-            categories: this.categories.map(ctg => ctg.id!),
+            categories: this.categoriesRef.map(ctg => ctg.id!),
         };
     }
 }

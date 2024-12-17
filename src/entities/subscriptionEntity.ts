@@ -1,26 +1,26 @@
-export interface SuscriptionPriceInterface{
+export interface SubscriptionPriceInterface{
     _id?: string;
     startDate: string;
     amount: number;
-    suscripcionId: SuscriptionInterface;
+    subscriptionRef: SubscriptionInterface;
 }
 
-export interface SuscriptionInterface {
+export interface SubscriptionInterface {
     _id?: string;
     type: string;
 }
 
-export class SuscriptionPrice {
+export class SubscriptionPrice {
     readonly id?: string;
     private startDate: Date;
     private amount: number;
-    private suscripcionId: Suscription | null;
+    private subscriptionId: Subscription | null;
 
-    constructor({_id, startDate, amount, suscripcionId}:SuscriptionPriceInterface) {
+    constructor({_id, startDate, amount, subscriptionRef}:SubscriptionPriceInterface) {
         this.id = _id;
         this.startDate = new Date(startDate);
         this.amount = amount;
-        this.suscripcionId = Suscription.Parse(suscripcionId);
+        this.subscriptionId = Subscription.Parse(subscriptionRef);
     }
     
     public getStartDate() {
@@ -31,8 +31,8 @@ export class SuscriptionPrice {
         return this.amount;
     }
 
-    public getSuscription() {
-        return this.suscripcionId;
+    public getSubscription() {
+        return this.subscriptionId;
     }
 
     /**
@@ -42,19 +42,19 @@ export class SuscriptionPrice {
         return {
             startDate: this.startDate.toISOString(),
             amount: this.amount,
-            suscricionId: this.suscripcionId!.id!,
+            subscriptionRef: this.subscriptionId!.id!,
         };
     }
 }
 
-export class Suscription {
+export class Subscription {
     readonly id?: string;
     public type: string;
 
     /**
      * Utilizar unicamente para crear objetos nuevos, para su uso en peticiones HTTP utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, type}:SuscriptionInterface) {
+    constructor({_id, type}:SubscriptionInterface) {
         this.id = _id;
         this.type = type;
     }
@@ -65,9 +65,9 @@ export class Suscription {
      * @returns 
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    static Parse(data:any): Suscription | null {
+    static Parse(data:any): Subscription | null {
         if (data && typeof data === "object" && "type" in data) return null;
-        return new Suscription({_id: data._id, type: data.type});
+        return new Subscription({_id: data._id, type: data.type});
     }
 
     /**

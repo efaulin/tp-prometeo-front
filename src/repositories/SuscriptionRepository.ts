@@ -1,9 +1,9 @@
-import { Suscription, SuscriptionInterface } from "../entities/suscriptionEntity";
+import { Subscription, SubscriptionInterface } from "../entities/subscriptionEntity";
 import axiosInstance from "../utils/axiosInstance";
 
-export class SuscriptionRepository {
-    static async GetAll(): Promise<Suscription[]> {
-        const response = await axiosInstance.get('/suscripcion');
-        return (response.data as SuscriptionInterface[]).map(scp => new Suscription(scp));
+export class SubscriptionRepository {
+    static async GetAll(): Promise<Subscription[]> {
+        const response = await axiosInstance.get('/subscription');
+        return (response.data as SubscriptionInterface[]).map(scp => new Subscription(scp));
     }
 }
