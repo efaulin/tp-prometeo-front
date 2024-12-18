@@ -18,9 +18,10 @@ export interface UserInterface {
 }
 
 export class UserSubscription {
-    readonly startDate: Date;
-    readonly endDate: Date;
-    readonly subscription: Subscription | null;
+    //Estos valores pueden ser solo lectura
+    public startDate: Date;
+    public endDate: Date;
+    public subscription: Subscription | null;
 
     constructor(usrScr?:UserSubscriptionInterface, startDate?:Date, endDate?:Date, subscription?:Subscription) {
         if (usrScr) {

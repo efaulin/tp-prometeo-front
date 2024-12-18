@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
-import axiosInstance from '../utils/axiosInstance';
 import { User, UserInterface, UserSubscription, UserSubscriptionInterface } from '../entities/userEntity'; 
 import { Role, RoleInterface } from '../entities/roleEntity';
 import NavBar from './Navbar';
 import { Subscription, SubscriptionInterface } from '../entities/subscriptionEntity';
 import { UserRepository } from '../repositories/UserRepository';
-import { SubscriptionRepository } from '../repositories/SubscriptionRepository';
+import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
 import { UserDataModal } from '../components/userModal';
 
 const UsersPage: React.FC = () => {
