@@ -26,7 +26,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     useEffect(() => {
         fetching().then(function () {
             if (initialData) {
-                console.log(initialData); //ASK Porque susbscriptions[i].subscription es NULL??????
+                console.log(initialData);
                 setFormData(initialData);
             } else {
                 // const tmpUser = new User();
@@ -85,20 +85,25 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     }
 
     function handleSubscriptionDelete(index:number) {
-        //formData.subscriptions[index]
+        const tmpSub = formData.subscriptions;
+        tmpSub.splice(index, 1);
+        setFormData({...formData, subscriptions: tmpSub} as User);
     }
 
     function handleSubscriptionAdd() {
-        //¯\_(ツ)_/¯
+        const tmpSub = formData.subscriptions;
+        tmpSub.push(new UserSubscription());
+        setFormData({...formData, subscriptions: tmpSub} as User);
     }
 
     function handleSubmit() {
+        //TODO Testear se manden correctamente todos los datos al padre.
         handleSave(formData);
         handleClose();
     }
 
     return (
-        <Modal show={show} onHide={handleClose} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={show} onHide={() => {initialData= null; handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
                 <Modal.Title>{initialData ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
             </Modal.Header>
@@ -158,7 +163,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         <tr key={index}>
                             <td>
                             <Form.Select
-                                value={sub.subscription!.id}
+                                value={sub.subscription?.id}
                                 onChange={(e) => handleSubscriptionChange(index, e)}
                             >
                                 <option value="">Seleccionar</option>
