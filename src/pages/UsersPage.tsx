@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import { User, UserInterface, UserSubscription, UserSubscriptionInterface } from '../entities/userEntity'; 
 import { Role, RoleInterface } from '../entities/roleEntity';
-import NavBar from './Navbar';
+//import NavBar from './Navbar';
 import { Subscription, SubscriptionInterface } from '../entities/subscriptionEntity';
 import { UserRepository } from '../repositories/UserRepository';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
@@ -104,7 +104,7 @@ const UsersPage: React.FC = () => {
   
     return (
       <div>
-        <NavBar/>
+        {/* <NavBar/> */}
         <h2>Usuarios</h2>
         <Button onClick={handleAddUser}>Agregar Usuario</Button>
         <Table striped bordered hover>
@@ -118,7 +118,7 @@ const UsersPage: React.FC = () => {
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user.email}>
+              <tr key={user.id}>
                 <td>{user.username}</td>
                 <td>{user.email}</td>
                 <td>{user.role ? user.role.name : "RoleDeleted"}</td>

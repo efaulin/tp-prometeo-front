@@ -66,8 +66,10 @@ export class Subscription {
      */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static Parse(data:any): Subscription | null {
-        if (data && typeof data === "object" && "type" in data) return null;
-        return new Subscription({_id: data._id, type: data.type});
+        if (data && typeof data === "object" && "type" in data) {
+            return new Subscription({_id: data._id, type: data.type});
+        }
+        return null;
     }
 
     /**

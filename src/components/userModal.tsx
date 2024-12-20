@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Table } from 'react-bootstrap';
-import { User } from '../entities/userEntity';
+import { User, UserSubscription } from '../entities/userEntity';
 import { Role } from '../entities/roleEntity';
 import { UserRepository } from '../repositories/UserRepository';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
 import { SubscriptionPriceRepository } from '../repositories/SubscriptionPriceRepository';
+import { alignPropType } from 'react-bootstrap/esm/types';
 
 interface EditModalProps {
     show: boolean;
@@ -18,7 +19,6 @@ interface EditModalProps {
 export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, handleSave, initialData}) => {
     //Modal data
     const [formData, setFormData] = useState<User>(new User()); //Objeto a pasar al padre, contiene todos los datos y se usa para el manejo de datos primitivos
-    const [userRoleData, setUserRoleData] = useState<Role>(new Role());
     //Collections data
     const [roles, setRoles] = useState<Role[]>([]);
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -26,11 +26,20 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     useEffect(() => {
         fetching().then(function () {
             if (initialData) {
+                console.log(initialData); //ASK Porque susbscriptions[i].subscription es NULL??????
                 setFormData(initialData);
-                setUserRoleData(initialData.role!);
             } else {
+                // const tmpUser = new User();
+                // tmpUser.role = new Role({_id:"0", name:""});
+                // tmpUser.subscriptions.push(
+                //     new UserSubscription({
+                //         _id:"0",
+                //         startDate:new Date().toISOString(),
+                //         endDate:new Date().toISOString(),
+                //         subscriptionRef:{_id:"0", type:""}
+                //     })
+                // );
                 setFormData(new User());
-                setUserRoleData(new Role());
             }
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,7 +63,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         setFormData({...formData, [name]: value} as User);
     }
 
-    function handleRoleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    function handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>) {
         const { value } = e.target;
         setFormData({...formData, role: roles.find(role => role.id == value)} as User);
     }
@@ -89,7 +98,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     }
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
                 <Modal.Title>{initialData ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
             </Modal.Header>
@@ -127,20 +136,15 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                 </Form.Group>
                 <Form.Group controlId="formRole">
                     <Form.Label>Tipo de usuario</Form.Label>
-                    <Form.Control
-                        required
-                        name="role"
-                        value={formData.role!.id!}
-                        onChange={handleRoleChange}
-                    />
-                    <Form.Select aria-label="Seleccione rol del usuario">
+                    <Form.Select aria-label="Seleccione rol del usuario" required name="role" value={formData.role?.id ? formData.role?.id : ""} onChange={handleRoleChange}>
                         {roles.map((role) => (
                             <option value={role.id}>{role.name}</option>
                         ))}
                     </Form.Select>
                 </Form.Group>
                 <br/>
-                <Table striped bordered hover>
+                <Form.Label>Suscripciones</Form.Label>
+                <Table bordered hover>
                     <thead>
                         <tr>
                             <th>Tipo de Suscripción</th>
@@ -149,14 +153,12 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        //TODO Probar todo
-                        //TODO Como manejo los cambios en suscripciones
+                    <tbody className='text-center'>
                         {formData.subscriptions.map((sub, index) => (
                         <tr key={index}>
                             <td>
                             <Form.Select
-                                value={sub.subscription!.id!}
+                                value={sub.subscription!.id}
                                 onChange={(e) => handleSubscriptionChange(index, e)}
                             >
                                 <option value="">Seleccionar</option>
@@ -171,14 +173,14 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                             <Form.Control
                                 name="startDate"
                                 type="date"
-                                value={sub.startDate.toTimeString()}
+                                value={sub.startDate.toLocaleDateString('en-CA')}
                                 onChange={(e) => handleDateChange(index, e)}
                             />
                             </td>
                             <td>
                             <Form.Control
                                 type="date"
-                                value={sub.endDate.toTimeString()}
+                                value={sub.endDate.toLocaleDateString('en-CA')}
                                 onChange={(e) => handleDateChange(index, e)}
                             />
                             </td>
@@ -192,15 +194,21 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                             </td>
                         </tr>
                         ))}
+                        <tr className='text-left'>
+                            <td colSpan={4}>
+                                <Button className="" size="sm" variant="success" onClick={handleSubscriptionAdd}>
+                                    Agregar Suscripción
+                                </Button>
+                            </td>
+                        </tr>
                     </tbody>
-                    </Table>
-                    <Button variant="success" onClick={handleSubscriptionAdd}>
-                        Agregar Suscripción
-                    </Button>
+                </Table>
                 <br/>
-                <Button variant="primary" type="submit">
-                    {initialData ? 'Guardar cambios' : 'Agregar'}
-                </Button>
+                <div className='text-center'>
+                    <Button className="mx-auto" variant="primary" type="submit">
+                        {initialData ? 'Guardar cambios' : 'Agregar'}
+                    </Button>
+                </div>
             </Form>
           </Modal.Body>
         </Modal>
