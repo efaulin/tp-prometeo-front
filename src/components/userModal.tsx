@@ -166,7 +166,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                 value={sub.subscription?.id}
                                 onChange={(e) => handleSubscriptionChange(index, e)}
                             >
-                                <option value="">Seleccionar</option>
+                                <option value="0">Seleccionar</option>
                                 {subscriptions.map((sbc) => (
                                 <option key={sbc.id} value={sbc.id}>
                                     {sbc.type}
@@ -184,6 +184,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                             </td>
                             <td>
                             <Form.Control
+                                name="endDate"
                                 type="date"
                                 value={sub.endDate.toLocaleDateString('en-CA')}
                                 onChange={(e) => handleDateChange(index, e)}
