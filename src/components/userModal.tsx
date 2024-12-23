@@ -29,16 +29,6 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                 console.log(initialData);
                 setFormData(initialData);
             } else {
-                // const tmpUser = new User();
-                // tmpUser.role = new Role({_id:"0", name:""});
-                // tmpUser.subscriptions.push(
-                //     new UserSubscription({
-                //         _id:"0",
-                //         startDate:new Date().toISOString(),
-                //         endDate:new Date().toISOString(),
-                //         subscriptionRef:{_id:"0", type:""}
-                //     })
-                // );
                 setFormData(new User());
             }
         });
@@ -96,8 +86,9 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         setFormData({...formData, subscriptions: tmpSub} as User);
     }
 
-    function handleSubmit() {
+    function handleSubmit(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         //TODO Testear se manden correctamente todos los datos al padre.
+        e.preventDefault();
         handleSave(formData);
         handleClose();
     }

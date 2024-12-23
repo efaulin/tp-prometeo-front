@@ -9,11 +9,13 @@ export class UserRepository {
     }
 
     static async Create(obj:User): Promise<User> {
+        obj = User.FromExpectedUser(obj);
         const response = await axiosInstance.post(`/user`, obj.toAPI());
         return (new User(response.data));
     }
 
     static async Update(obj:User): Promise<User> {
+        obj = User.FromExpectedUser(obj);
         const response = await axiosInstance.put(`/user/${obj.id!}`, obj.toAPI());
         return (new User(response.data));
     }

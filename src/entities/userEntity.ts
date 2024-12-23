@@ -59,14 +59,14 @@ export class User {
     public role: Role | null;
     public subscriptions: UserSubscription[];
 
-    constructor(user?:UserInterface) {
-        if (user) {
-            this.id = user._id;
-            this.username = user.username;
-            this.password = user.password;
-            this.email = user.email;
-            this.role = Role.Parse(user.roleRef);
-            this.subscriptions = user.subscriptionsRef.map(usrScr => new UserSubscription(usrScr));
+    constructor(userInterface?:UserInterface) {
+        if (userInterface) {
+            this.id = userInterface._id;
+            this.username = userInterface.username;
+            this.password = userInterface.password;
+            this.email = userInterface.email;
+            this.role = Role.Parse(userInterface.roleRef);
+            this.subscriptions = userInterface.subscriptionsRef.map(usrScr => new UserSubscription(usrScr));
         } else {
             this.id = undefined;
             this.username = "";
@@ -85,6 +85,27 @@ export class User {
             roleRef: this.role!.id!,
             subscriptionsRef: this.subscriptions.map(usrScr => usrScr.toAPI()),
         };
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static FromExpectedUser(user:any) {
+        if (user instanceof User) {
+            return user;
+        } else {
+            return new User({
+                _id: user.id,
+                username: user.username,
+                password: user.password,
+                email: user.email,
+                roleRef: {...user.role!, _id:user.role!.id!},
+                subscriptionsRef: user.subscriptions.map((usrsub: UserSubscription) => {
+                    return {
+                        subscriptionRef:{...usrsub.subscription!, _id: usrsub.subscription!.id!},
+                        startDate:usrsub.startDate.toISOString(),
+                        endDate:usrsub.endDate.toISOString()}}
+                ),
+            });
+        }
     }
 
     /**
