@@ -2,9 +2,20 @@ import { createContext, useContext, useMemo, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
 
+interface UserAuthData {
+  id: string;
+  username: string;
+  role: string;
+}
+
+export interface AuthData {
+  token: string;
+  user: UserAuthData;
+}
+
 interface AuthContextType {
-  user: any; // Cambia `any` al tipo específico de usuario si lo tienes
-  login: (data: any) => void; // Cambia `any` si tienes un tipo específico para `data`
+  user: UserAuthData; // Cambia `any` al tipo específico de usuario si lo tienes
+  login: (data: UserAuthData) => void; // Cambia `any` si tienes un tipo específico para `data`
   logout: () => void;
 }
 
@@ -19,7 +30,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const navigate = useNavigate();
 
   // Llama a esta función para autenticar al usuario
-  const login = async (userData: any) => {
+  const login = async (userData: UserAuthData) => {
     setUser(userData);
   };
 

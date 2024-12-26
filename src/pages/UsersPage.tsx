@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Alert } from 'react-bootstrap';
 import { User } from '../entities/userEntity';
-//import NavBar from './Navbar';
+import NavBar from './Navbar';
 import { UserRepository } from '../repositories/UserRepository';
 import { UserDataModal } from '../components/userModal';
 
@@ -49,7 +49,7 @@ const UsersPage: React.FC = () => {
   
     return (
       <div>
-        {/* <NavBar/> */}
+        <NavBar/>
         <h2>Usuarios</h2>
         <Button onClick={handleAddUser}>Agregar Usuario</Button>
         <Table striped bordered hover>

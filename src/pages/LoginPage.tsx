@@ -25,8 +25,8 @@ export const LoginPage = () => {
       });
       console.log(response);
       // Almacenar el token en el localStorage
-      localStorage.setItem("token", response.data.data.token);
-      await login(response.data.data.user);
+      localStorage.setItem("token", response.data.token);
+      await login(response.data.user);
       // Redirigir al perfil o a la página protegida
       navigate("/users");
     } catch (error) {

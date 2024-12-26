@@ -39,7 +39,7 @@ function NavBar() {
             {user && user.username ? (
                 <div className="d-flex align-items-center gap-3">
                     <Badge className='text-nowrap' bg="primary">Bienvenido {user.username}</Badge>
-                    <Badge className='text-nowrap' bg="success">{user.role.name}</Badge>
+                    <Badge className='text-nowrap' bg="success">{user.role}</Badge>
                     <Form className="d-flex">
                         <Button variant="outline-danger" onClick={handleLogout}>logout</Button>
                     </Form>
