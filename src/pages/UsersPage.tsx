@@ -35,16 +35,13 @@ const UsersPage: React.FC = () => {
     };
   
     const handleSave = async (user:User) => {
-      console.log("Saving user:");
-      console.log(user as User);
       try {
         if (user.id) {
-          console.log("Update method ->"); //TODO Borrar log; Agregar refresh de tabla
-          const result = await UserRepository.Update(user);
-          console.log(result);
+          await UserRepository.Update(user);
         } else {
-          await UserRepository.Create(user)
+          await UserRepository.Create(user);
         }
+        fetchUsers();
       } catch (error) {
         console.log("Error: " + error);
       }
