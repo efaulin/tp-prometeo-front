@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "./useLocalStorage";
 
-interface UserAuthData {
+export interface UserAuthData {
   id: string;
   username: string;
   role: string;

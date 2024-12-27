@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Table } from 'react-bootstrap';
 import { User, UserSubscription } from '../entities/userEntity';
 import { Role } from '../entities/roleEntity';
-import { UserRepository } from '../repositories/UserRepository';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
-import { SubscriptionPriceRepository } from '../repositories/SubscriptionPriceRepository';
-import { alignPropType } from 'react-bootstrap/esm/types';
 
 interface EditModalProps {
     show: boolean;
@@ -86,8 +83,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         setFormData({...formData, subscriptions: tmpSub} as User);
     }
 
-    function handleSubmit(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        //TODO Testear se manden correctamente todos los datos al padre.
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         handleSave(formData);
         handleClose();
