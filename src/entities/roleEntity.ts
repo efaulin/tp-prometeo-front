@@ -20,8 +20,6 @@ export class Role {
         }
     }
 
-    //TODO Hacer un metodo Parce(data) para todos los objetos que vengan de la API.
-    //[X] Funciona!
     /**
      * Con lo recibido de la peticion HTTP, devuelve un objeto con los tipos de objetos correctos para su manejo en el UI.
      * Usar para las refrencias.

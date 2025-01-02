@@ -105,7 +105,7 @@ const UsersPage: React.FC = () => {
                 <td>{user.email}</td>
                 <td>{user.role ? user.role.name : "RoleDeleted"}</td>
                 <td>
-                  <Button variant="warning" onClick={() => handleEditUser(user)}>Editar</Button>{' '}
+                  <Button variant="light" style={{backgroundColor:'#ced4da'}} onClick={() => handleEditUser(user)}>Editar</Button>{' '}
                   <Button variant="danger" onClick={() => handleDeleteModal(user)}>Eliminar</Button>
                 </td>
               </tr>
