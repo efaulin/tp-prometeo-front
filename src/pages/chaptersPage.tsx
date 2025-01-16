@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form, Row } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import NavBar from './Navbar';
 import { LanguageInterface }  from '../entities/languageEntity' ;
 import { NarratorInterface } from '../entities/narratorEntity';
 import { AuthorInterface } from '../entities/authorEntity';
@@ -158,7 +157,6 @@ const ChaptersPage: React.FC = () => {
   
     return (
       <div>
-        <NavBar/>
         <h2 className='mb-3'>Capitulos</h2>
         <Button className='mb-3' onClick={handleAddChapter}>Agregar Capitulo</Button>
         <Table striped bordered hover>

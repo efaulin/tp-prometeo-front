@@ -1,12 +1,10 @@
 import { useAuth } from "../utils/useAuth";
-import NavBar from "./Navbar";
 import { Link } from 'react-router-dom';
 
 const DashboardPage = () => {
     const { user } = useAuth();
     return (
         <div>
-            <NavBar/>
             <h1>Home Page Dashboard</h1>
             {user && user.username ? (
                 <div>

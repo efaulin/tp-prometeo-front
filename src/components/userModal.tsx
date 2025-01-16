@@ -106,6 +106,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                   onChange={handleChange}
                 />
               </Form.Group>
+                {/*TODO Si no se cambia la contraseña en el modal, no se tiene que subir a la base de datos.*/}
                 <Form.Group controlId="formPass">
                     <Form.Label>Contraseña</Form.Label>
                     <Form.Control

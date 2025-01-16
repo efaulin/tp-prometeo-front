@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { User } from '../entities/userEntity';
-import NavBar from './Navbar';
 import { UserRepository } from '../repositories/UserRepository';
 import { UserDataModal } from '../components/userModal';
-import { NotificationToast } from '../components/notificationToast';
 import { ConfirmationModal } from '../components/confirmationModal';
+import toast from 'react-hot-toast';
 
 const UsersPage: React.FC = () => {
     //Variables para el manejo de la tabla de usuarios
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User>(new User());
-    //Variables para el manejo de aparacion de modals o toasts
+    //Variables para el manejo de aparacion de otros componentes
     const [showUserModal, setShowUserModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [showToast, setShowToast] = useState(false);
-    //Variables para el manejo de toasts
-    const [toastText, setToastText] = useState("");
-    const [toastVariant, setToastVariant] = useState<'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark'>("light");
+    const [showLoading, setShowLoading] = useState(true);
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
       fetchUsers().catch((error) => {
         console.log(error);
-        showError("Error al obtener los usuarios: " + error.response.data.message);
+        toast.error("Error al obtener los usuarios: " + error.response.data.message);
       });
     }, []);
-  
+    
     const fetchUsers = async () => {
+      setShowLoading(true);
       setUsers(await UserRepository.GetAll());
+      setShowLoading(false);
     };
     
     const handleAddUser = () => {
@@ -47,49 +45,72 @@ const UsersPage: React.FC = () => {
     }
 
     const handleDeleteUser = async (userId: string) => {
-      try {
-        await UserRepository.Delete(userId);
-        showSuccess("Peticion realizada correctamente");
-        fetchUsers();
-      } catch (error) {
-        console.log("Error: " + error);
-        showError("Error al realizar la peticion");
-      }
-    };
-  
-    const handleSave = async (user:User) => {
-      try {
-        if (user.id) {
-          await UserRepository.Update(user);
-        } else {
-          await UserRepository.Create(user);
+      toast.promise(
+        UserRepository.Delete(userId).then(fetchUsers, undefined),
+        {
+          loading: 'Borrando...',
+          success: <b>¡Usuario borrado!</b>,
+          error: (err) => (<span><b>Hubo un error:</b><br/>{err.toString()}</span>),
+        },
+        {
+          success: {
+            duration: 3000,
+          },
+          error: {
+            duration: 5000,
+          }
         }
-        showSuccess("Peticion realizada correctamente");
-        fetchUsers();
-      } catch (error) {
-        console.log("Error: " + error);
-        showError("Error al realizar la peticion: " + error);
+      );
+    };
+
+    const handleSave = async (user:User) => {
+      if (user.id) {
+        toast.promise(
+          UserRepository.Update(user).then(fetchUsers, undefined),
+          {
+            loading: 'Guardando...',
+            success: <b>¡Usuario modificado!</b>,
+            error: (err) => (<span><b>Hubo un error:</b><br/>{err.toString()}</span>),
+          },
+          {
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            }
+          }
+        );
+      } else {
+        toast.promise(
+          UserRepository.Create(user).then(fetchUsers, undefined),
+          {
+            loading: 'Guardando...',
+            success: <b>¡Usuario creado!</b>,
+            error: (err) => (<span><b>Hubo un error:</b><br/>{err.toString()}</span>),
+          },
+          {
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            }
+          }
+        );
       }
-    }
-
-    const showError = (text:string) => {
-      setToastText(text);
-      setToastVariant("danger");
-      setShowToast(true);
-    }
-
-    const showSuccess = (text:string) => {
-      setToastText(text);
-      setToastVariant("success");
-      setShowToast(true);
     }
   
     return (
       <div>
-        <NavBar/>
         <h2>Usuarios</h2>
         <Button onClick={handleAddUser}>Agregar Usuario</Button>
-        <Table striped bordered hover>
+        {
+          showLoading ?
+          //showLoading = TRUE
+          <div className='text-center'><h3>Cargando...</h3></div>
+          ://showLoading = FALSE
+          <Table className='my-3' striped bordered hover>
           <thead>
             <tr>
               <th>Nombre de usuario</th>
@@ -111,7 +132,8 @@ const UsersPage: React.FC = () => {
               </tr>
             ))}
           </tbody>
-        </Table>
+          </Table>
+        }
   
         {/* Modal para añadir o editar usuario */}
         <UserDataModal
@@ -119,16 +141,6 @@ const UsersPage: React.FC = () => {
           handleClose={() => setShowUserModal(false)}
           handleSave={handleSave}
           initialData={selectedUser}
-        />
-
-        {/* Toast para notificar al usuario cuando cree, modifique o borre un usuario */}
-        <NotificationToast
-          show={showToast}
-          handleClose={() => setShowToast(false)}
-          delayInSec={undefined}
-          header={undefined}
-          body={toastText}
-          variant={toastVariant}
         />
 
         {/* Modal para solicitar confirmacion al borrar un usuario */}

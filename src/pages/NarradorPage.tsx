@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import NavBar from './Navbar';
 import { narradorInterface } from '../entities/narratorEntity';
 
 const NarradorPage: React.FC = () => {
@@ -59,7 +58,6 @@ const NarradorPage: React.FC = () => {
   
     return (
       <div>
-        <NavBar/>
         <h2>Narradores</h2>
         <Button onClick={handleAddNarrador}>Agregar narrador</Button>
         <Table striped bordered hover>

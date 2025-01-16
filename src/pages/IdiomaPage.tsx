@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import axiosInstance from '../utils/axiosInstance';
-import NavBar from './Navbar';
 import { idiomaInterface } from '../entities/languageEntity';
 
 const IdiomaPage: React.FC = () => {
@@ -61,7 +60,6 @@ const IdiomaPage: React.FC = () => {
   
     return (
       <div>
-        <NavBar/>
         <h2>Idiomas</h2>
         <Button onClick={handleAddIdioma}>Agregar idioma</Button>
         <Table striped bordered hover>
