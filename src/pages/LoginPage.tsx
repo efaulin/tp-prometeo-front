@@ -4,17 +4,17 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Badge from 'react-bootstrap/Badge';
+import toast from "react-hot-toast";
 
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const { login } = useAuth();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleLogin = async (e: any) => {
     e.preventDefault();
     try {
@@ -23,19 +23,19 @@ export const LoginPage = () => {
         username,
         password,
       });
-      console.log(response);
       // Almacenar el token en el localStorage
       localStorage.setItem("token", response.data.token);
       await login(response.data.user);
       // Redirigir al perfil o a la página protegida
       navigate("/users");
-    } catch (error) {
-      setError("Credenciales incorrectas. Intenta de nuevo.");
+    } catch {
+      toast.error("Credenciales incorrectas. Intenta de nuevo.");
+      setPassword("");
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "100vh" }}>
+    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "85vh" }}>
       <div className="w-100" style={{ maxWidth: "400px" }}>
       <Form onSubmit={handleLogin}>
         <Form.Group className="mb-3">
@@ -61,8 +61,6 @@ export const LoginPage = () => {
         <Button variant="primary" type="submit">
           Submit
         </Button>
-        <br />
-        <Badge bg="danger">{error}</Badge>
       </Form>
       </div>
     </div>

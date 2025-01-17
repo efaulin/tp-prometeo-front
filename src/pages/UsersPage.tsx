@@ -17,16 +17,22 @@ const UsersPage: React.FC = () => {
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
-      fetchUsers().catch((error) => {
-        console.log(error);
-        toast.error("Error al obtener los usuarios: " + error.response.data.message);
-      });
+      fetchUsers();
     }, []);
     
-    const fetchUsers = async () => {
+    const fetchUsers = () => {
       setShowLoading(true);
-      setUsers(await UserRepository.GetAll());
-      setShowLoading(false);
+      UserRepository.GetAll()
+        .then(
+          //OnFulfilled
+          (users) => {
+            setUsers(users);
+          },
+          //OnRejected
+          (error) => {
+            toast.error("Error al obtener los usuarios: " + (error.response.data.message ? error.response.data.message : error.toString()));
+          }
+      ).finally(() => {setShowLoading(false)});
     };
     
     const handleAddUser = () => {
