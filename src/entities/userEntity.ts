@@ -102,8 +102,9 @@ export class User {
                     return {
                         subscriptionRef:{...usrsub.subscription!, _id: usrsub.subscription!.id!},
                         startDate:usrsub.startDate.toISOString(),
-                        endDate:usrsub.endDate.toISOString()}}
-                ),
+                        endDate:usrsub.endDate.toISOString()
+                    }
+                }),
             });
         }
     }

@@ -9,7 +9,7 @@ import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
 interface EditModalProps {
     show: boolean;
     handleClose: () => void;
-    handleSave: (user: User) => void;
+    handleSave: (user: User | Partial<User>) => void;
     initialData?: User | null;
 }
 
@@ -23,7 +23,6 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     useEffect(() => {
         fetching().then(function () {
             if (initialData) {
-                console.log(initialData);
                 setFormData(initialData);
             } else {
                 setFormData(new User());
@@ -85,7 +84,19 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        handleSave(formData);
+        if (initialData) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const updateFields: any = {};
+            updateFields.id = initialData.id;
+            if (formData.username != initialData.username) updateFields.username = formData.username;
+            if (formData.password != initialData.password) updateFields.password = formData.password;
+            if (formData.email != initialData.email) updateFields.email = formData.email;
+            if (formData.role != initialData.role) updateFields.role = formData.role;
+            if (formData.subscriptions != initialData.subscriptions) updateFields.subscriptions = formData.subscriptions;
+            handleSave(updateFields);
+        } else {
+            handleSave(formData);
+        }
         handleClose();
     }
 

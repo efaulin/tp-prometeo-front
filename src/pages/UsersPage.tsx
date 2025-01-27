@@ -69,10 +69,10 @@ const UsersPage: React.FC = () => {
       );
     };
 
-    const handleSave = async (user:User) => {
+    const handleSave = async (user: User | Partial<User>) => {
       if (user.id) {
         toast.promise(
-          UserRepository.Update(user).then(fetchUsers, undefined),
+          UserRepository.PartialUpdate(user).then(fetchUsers, undefined),
           {
             loading: 'Guardando...',
             success: <b>¡Usuario modificado!</b>,
@@ -87,7 +87,7 @@ const UsersPage: React.FC = () => {
             }
           }
         );
-      } else {
+      } else if (user instanceof User) {
         toast.promise(
           UserRepository.Create(user).then(fetchUsers, undefined),
           {

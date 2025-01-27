@@ -14,9 +14,21 @@ export class UserRepository {
         return (new User(response.data));
     }
 
-    static async Update(obj:User): Promise<User> {
+    static async FullyUpdate(obj:User): Promise<User> {
         obj = User.FromExpectedUser(obj);
         const response = await axiosInstance.put(`/user/${obj.id!}`, obj.toAPI());
+        return (new User(response.data));
+    }
+
+    static async PartialUpdate(obj:Partial<User>): Promise<User> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const updateFields: any = {};
+        if (obj.username) updateFields.username = obj.username;
+        if (obj.password) updateFields.password = obj.password;
+        if (obj.email) updateFields.email = obj.email;
+        if (obj.role) updateFields.roleRef = obj.role.id!;
+        if (obj.subscriptions) updateFields.subscriptionsRef = obj.subscriptions.map(usrScr => usrScr.toAPI());
+        const response = await axiosInstance.put(`/user/${obj.id!}`, updateFields);
         return (new User(response.data));
     }
 
