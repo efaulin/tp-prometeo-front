@@ -19,20 +19,23 @@ const UsersPage: React.FC = () => {
     useEffect(() => {
       fetchUsers();
     }, []);
-    
+
     const fetchUsers = () => {
       setShowLoading(true);
-      UserRepository.GetAll()
-        .then(
-          //OnFulfilled
-          (users) => {
-            setUsers(users);
-          },
-          //OnRejected
-          (error) => {
-            toast.error("Error al obtener los usuarios: " + (error.response.data.message ? error.response.data.message : error.toString()));
+      toast.promise(
+        UserRepository.GetAll().then((users) => {setUsers(users);}, undefined).finally(() => {setShowLoading(false)}),
+        {
+          loading: 'Adquiriendo usuarios...',
+          success: undefined,
+          error: (error) => (<span><b>Hubo un error:</b><br/>{(error.response.data.message ? error.response.data.message : error.toString())}</span>),
+        },
+        {
+          error: {
+            duration: 5000,
           }
-      ).finally(() => {setShowLoading(false)});
+        }
+      );
+      return 1;
     };
     
     const handleAddUser = () => {
@@ -72,7 +75,7 @@ const UsersPage: React.FC = () => {
     const handleSave = async (user: User | Partial<User>) => {
       if (user.id) {
         toast.promise(
-          UserRepository.PartialUpdate(user).then(fetchUsers, undefined),
+          UserRepository.Update(user).then(fetchUsers, undefined),
           {
             loading: 'Guardando...',
             success: <b>¡Usuario modificado!</b>,
@@ -87,9 +90,9 @@ const UsersPage: React.FC = () => {
             }
           }
         );
-      } else if (user instanceof User) {
+      } else {
         toast.promise(
-          UserRepository.Create(user).then(fetchUsers, undefined),
+          UserRepository.Create(user as User).then(fetchUsers, undefined),
           {
             loading: 'Guardando...',
             success: <b>¡Usuario creado!</b>,
