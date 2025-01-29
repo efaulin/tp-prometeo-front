@@ -10,6 +10,8 @@ const UsersPage: React.FC = () => {
     //Variables para el manejo de la tabla de usuarios
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User>(new User());
+    //Debuggin
+    let doubleToastControl = false;
     //Variables para el manejo de aparacion de otros componentes
     const [showUserModal, setShowUserModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -17,13 +19,14 @@ const UsersPage: React.FC = () => {
 
     // Obtener usuarios al cargar la página
     useEffect(() => {
-      fetchUsers();
+      if (!doubleToastControl) fetchUsers();
     }, []);
 
     const fetchUsers = () => {
+      doubleToastControl = true;
       setShowLoading(true);
       toast.promise(
-        UserRepository.GetAll().then((users) => {setUsers(users);}, undefined).finally(() => {setShowLoading(false)}),
+        UserRepository.GetAll().then((users) => {setUsers(users); doubleToastControl = false;}, undefined).finally(() => {setShowLoading(false)}),
         {
           loading: 'Adquiriendo usuarios...',
           success: undefined,
@@ -35,7 +38,6 @@ const UsersPage: React.FC = () => {
           }
         }
       );
-      return 1;
     };
     
     const handleAddUser = () => {
