@@ -170,7 +170,7 @@ export class Chapter {
             hostsRef: this.hostsRef?.map(hst => hst.id!),
             //Audiolibro -> Authors & Narrator
             authorsRef: this.authorsRef?.map(ath => ath.id!),
-            narratorRef: this.narratorRef?.id, //TODO Teastear, no me acuerdo como lo manejaba el back
+            narratorRef: this.narratorRef?.id,
         };
     }
 }

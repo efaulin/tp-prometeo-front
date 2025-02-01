@@ -10,7 +10,7 @@ interface EditModalProps {
     show: boolean;
     handleClose: () => void;
     handleSave: (user: User | Partial<User>) => void;
-    initialData?: User | null;
+    initialData: User;
 }
 
 export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, handleSave, initialData}) => {
@@ -23,7 +23,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     useEffect(() => {
         fetching().then(function () {
             if (initialData) {
-                setFormData(initialData);
+                setFormData(initialData.clone());
             } else {
                 setFormData(new User());
             }
@@ -84,24 +84,43 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        if (initialData) {
+        if (initialData.id) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updateFields: any = {};
             updateFields.id = initialData.id;
             if (formData.username != initialData.username) updateFields.username = formData.username;
             if (formData.password != initialData.password) updateFields.password = formData.password;
             if (formData.email != initialData.email) updateFields.email = formData.email;
-            if (formData.role != initialData.role) updateFields.role = formData.role;
-            if (formData.subscriptions != initialData.subscriptions) updateFields.subscriptions = formData.subscriptions;
+            if (formData.role?.id != initialData.role?.id) updateFields.role = formData.role;
+            //Si cambia el tamaño de los arrays o su contenido, actualizo la propiedad "Subscriptions"
+            if (formData.subscriptions.length != initialData.subscriptions.length) {
+                updateFields.subscriptions = formData.subscriptions;
+            } else {
+                //Logica para revisar cambios en el array de "Subscripciones".
+                let isDifferent = false;
+                for (let i=0; i < formData.subscriptions.length && !isDifferent; i++) {
+                    //"formData.subscriptions" son las subscripciones que ingresa/modifica el usuario en el modal.
+                    const formDataScrp = formData.subscriptions[i].toAPI();
+                    let wasFound = false;
+                    //Por cada UsuarioSuscripcion de "formData.subscriptions" reviso este contenida en "initialData.subscriptions".
+                    for (let z=0; z < initialData.subscriptions.length && !wasFound; z++) {
+                        //"initialData.subscriptions" son las subscripciones del usuario sin modificar.
+                        const initialDataScrp = initialData.subscriptions[z].toAPI();
+                        wasFound = initialDataScrp.startDate == formDataScrp.startDate && initialDataScrp.endDate == formDataScrp.endDate && initialDataScrp.subscriptionRef == formDataScrp.subscriptionRef;
+                    }
+                    if (!wasFound) isDifferent = true;
+                }
+                if (isDifferent) updateFields.subscriptions = formData.subscriptions;
+            }
             handleSave(updateFields);
         } else {
             handleSave(formData);
         }
         handleClose();
     }
-
+    //TODO Realizar las comprobaciones en los inputs, ademas agregar opciones predefinidas para evitar asignaciones nulas.
     return (
-        <Modal show={show} onHide={() => {initialData= null; handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={show} onHide={() => {initialData = new User(); handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
                 <Modal.Title>{initialData ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
             </Modal.Header>
@@ -117,7 +136,6 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                   onChange={handleChange}
                 />
               </Form.Group>
-                {/*TODO Si no se cambia la contraseña en el modal, no se tiene que subir a la base de datos.*/}
                 <Form.Group controlId="formPass">
                     <Form.Label>Contraseña</Form.Label>
                     <Form.Control

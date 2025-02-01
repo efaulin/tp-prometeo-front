@@ -26,7 +26,7 @@ const UsersPage: React.FC = () => {
       doubleToastControl = true;
       setShowLoading(true);
       toast.promise(
-        UserRepository.GetAll().then((users) => {setUsers(users); doubleToastControl = false;}, undefined).finally(() => {setShowLoading(false)}),
+        UserRepository.GetAll().then((users) => {setUsers(users); doubleToastControl = false;}, (error) => {console.log(error); toast.error("Hubo un error: " + error.toString())}).finally(() => {setShowLoading(false)}),
         {
           loading: 'Adquiriendo usuarios...',
           success: undefined,
@@ -57,7 +57,7 @@ const UsersPage: React.FC = () => {
 
     const handleDeleteUser = async (userId: string) => {
       toast.promise(
-        UserRepository.Delete(userId).then(fetchUsers, undefined),
+        UserRepository.Delete(userId).then(fetchUsers, (error) => {console.log(error);}),
         {
           loading: 'Borrando...',
           success: <b>¡Usuario borrado!</b>,
@@ -77,7 +77,7 @@ const UsersPage: React.FC = () => {
     const handleSave = async (user: User | Partial<User>) => {
       if (user.id) {
         toast.promise(
-          UserRepository.Update(user).then(fetchUsers, undefined),
+          UserRepository.Update(user).then(fetchUsers, (error) => {console.log(error);}),
           {
             loading: 'Guardando...',
             success: <b>¡Usuario modificado!</b>,
@@ -94,7 +94,7 @@ const UsersPage: React.FC = () => {
         );
       } else {
         toast.promise(
-          UserRepository.Create(user as User).then(fetchUsers, undefined),
+          UserRepository.Create(user as User).then(fetchUsers, (error) => {console.log(error);}),
           {
             loading: 'Guardando...',
             success: <b>¡Usuario creado!</b>,
@@ -150,7 +150,7 @@ const UsersPage: React.FC = () => {
         <UserDataModal
           show={showUserModal}
           handleClose={() => setShowUserModal(false)}
-          handleSave={handleSave}
+          handleSave={(user) => {handleSave(user); console.log(user);}}
           initialData={selectedUser}
         />
 

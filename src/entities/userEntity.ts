@@ -87,6 +87,23 @@ export class User {
         };
     }
 
+    public clone() {
+        return new User({
+            _id: this.id,
+            username: this.username,
+            password: this.password,
+            email: this.email,
+            roleRef: {...this.role!, _id:this.role!.id!},
+            subscriptionsRef: this.subscriptions.map((usrsub: UserSubscription) => {
+                return {
+                    subscriptionRef:{...usrsub.subscription!, _id: usrsub.subscription!.id!},
+                    startDate:usrsub.startDate.toISOString(),
+                    endDate:usrsub.endDate.toISOString()
+                }
+            }),
+        });
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     static FromExpectedUser(user:any) {
         if (user instanceof User) {
