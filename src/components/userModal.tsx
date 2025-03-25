@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Table } from 'react-bootstrap';
+import { Modal, Button, Table } from 'react-bootstrap';
 import { User, UserSubscription } from '../entities/userEntity';
 import { Role } from '../entities/roleEntity';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
+import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext } from 'formik';
 
 interface EditModalProps {
     show: boolean;
@@ -118,6 +119,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         }
         handleClose();
     }
+
     //TODO Realizar las comprobaciones en los inputs, ademas agregar opciones predefinidas para evitar asignaciones nulas.
     return (
         <Modal show={show} onHide={() => {initialData = new User(); handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
@@ -125,114 +127,113 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                 <Modal.Title>{initialData ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group controlId="formName">
-                <Form.Label>Nombre de usuario</Form.Label>
-                <Form.Control
-                  required
-                  name="username"
-                  type="text"
-                  value={formData.username}
-                  onChange={handleChange}
-                />
-              </Form.Group>
-                <Form.Group controlId="formPass">
-                    <Form.Label>Contraseña</Form.Label>
-                    <Form.Control
-                    required
-                    name="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={handleChange}
+            <Formik
+                initialValues= { {user: new User()} }
+                onSubmit={(values, {setSubmitting}) => { console.log(values) }}
+            >
+                <Form>
+                    <label>Nombre de usuario</label>
+                    <Field
+                        id='username'
+                        required
+                        name="username"
+                        type="text"
                     />
-                </Form.Group>
-                <Form.Group controlId="formEmail">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                    required
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
+                    <label>Contraseña</label>
+                    <Field
+                        id='password'
+                        required
+                        name="password"
+                        type="password"
                     />
-                </Form.Group>
-                <Form.Group controlId="formRole">
-                    <Form.Label>Tipo de usuario</Form.Label>
-                    <Form.Select aria-label="Seleccione rol del usuario" required name="role" value={formData.role?.id ? formData.role?.id : ""} onChange={handleRoleChange}>
+                    <label>Email</label>
+                    <Field
+                        id='email'
+                        required
+                        name="email"
+                        type="email"
+                    />
+                    <label>Tipo de usuario</label>
+                    <Field
+                    component="select"
+                    id="userRole"
+                    name="userRole"
+                    multiple={false}
+                    >
                         {roles.map((role) => (
                             <option value={role.id}>{role.name}</option>
                         ))}
-                    </Form.Select>
-                </Form.Group>
-                <br/>
-                <Form.Label>Suscripciones</Form.Label>
-                <Table bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Tipo de Suscripción</th>
-                            <th>Fecha de Inicio</th>
-                            <th>Fecha de Fin</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className='text-center'>
-                        {formData.subscriptions.map((sub, index) => (
-                        <tr key={index}>
-                            <td>
-                            <Form.Select
-                                value={sub.subscription?.id}
-                                onChange={(e) => handleSubscriptionChange(index, e)}
-                            >
-                                <option value="0">Seleccionar</option>
-                                {subscriptions.map((sbc) => (
-                                <option key={sbc.id} value={sbc.id}>
-                                    {sbc.type}
-                                </option>
-                                ))}
-                            </Form.Select>
-                            </td>
-                            <td>
-                            <Form.Control
-                                name="startDate"
-                                type="date"
-                                value={sub.startDate.toLocaleDateString('en-CA')}
-                                onChange={(e) => handleDateChange(index, e)}
-                            />
-                            </td>
-                            <td>
-                            <Form.Control
-                                name="endDate"
-                                type="date"
-                                value={sub.endDate.toLocaleDateString('en-CA')}
-                                onChange={(e) => handleDateChange(index, e)}
-                            />
-                            </td>
-                            <td>
-                            <Button
-                                variant="danger"
-                                onClick={() => handleSubscriptionDelete(index)}
-                            >
-                                Eliminar
-                            </Button>
-                            </td>
-                        </tr>
-                        ))}
-                        <tr className='text-left'>
-                            <td colSpan={4}>
-                                <Button className="" size="sm" variant="success" onClick={handleSubscriptionAdd}>
-                                    Agregar Suscripción
+                    </Field>
+                    <br/>
+                    {/* <Form.Label>Suscripciones</Form.Label>
+                    <Table bordered hover>
+                        <thead>
+                            <tr>
+                                <th>Tipo de Suscripción</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className='text-center'>
+                            {formData.subscriptions.map((sub, index) => (
+                            <tr key={index}>
+                                <td>
+                                <Form.Select
+                                    value={sub.subscription?.id}
+                                    onChange={(e) => handleSubscriptionChange(index, e)}
+                                >
+                                    <option value="0">Seleccionar</option>
+                                    {subscriptions.map((sbc) => (
+                                    <option key={sbc.id} value={sbc.id}>
+                                        {sbc.type}
+                                    </option>
+                                    ))}
+                                </Form.Select>
+                                </td>
+                                <td>
+                                <Form.Control
+                                    name="startDate"
+                                    type="date"
+                                    value={sub.startDate.toLocaleDateString('en-CA')}
+                                    onChange={(e) => handleDateChange(index, e)}
+                                />
+                                </td>
+                                <td>
+                                <Form.Control
+                                    name="endDate"
+                                    type="date"
+                                    value={sub.endDate.toLocaleDateString('en-CA')}
+                                    onChange={(e) => handleDateChange(index, e)}
+                                />
+                                </td>
+                                <td>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => handleSubscriptionDelete(index)}
+                                >
+                                    Eliminar
                                 </Button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </Table>
-                <br/>
-                <div className='text-center'>
-                    <Button className="mx-auto" variant="primary" type="submit">
-                        {initialData ? 'Guardar cambios' : 'Agregar'}
-                    </Button>
-                </div>
-            </Form>
+                                </td>
+                            </tr>
+                            ))}
+                            <tr className='text-left'>
+                                <td colSpan={4}>
+                                    <Button className="" size="sm" variant="success" onClick={handleSubscriptionAdd}>
+                                        Agregar Suscripción
+                                    </Button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </Table> */}
+                    <br/>
+                    <div className='text-center'>
+                        <Button className="mx-auto" variant="primary" type="submit">
+                            {initialData ? 'Guardar cambios' : 'Agregar'}
+                        </Button>
+                    </div>
+                </Form>
+            </Formik>
           </Modal.Body>
         </Modal>
     );
