@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Table } from 'react-bootstrap';
+import { Modal, Button, Table, FormLabel } from 'react-bootstrap';
 import { User, UserSubscription } from '../entities/userEntity';
 import { Role } from '../entities/roleEntity';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
 import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext } from 'formik';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface EditModalProps {
     show: boolean;
@@ -132,38 +133,46 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                 onSubmit={(values, {setSubmitting}) => { console.log(values) }}
             >
                 <Form>
-                    <label>Nombre de usuario</label>
-                    <Field
-                        id='username'
-                        required
-                        name="username"
-                        type="text"
-                    />
-                    <label>Contraseña</label>
-                    <Field
-                        id='password'
-                        required
-                        name="password"
-                        type="password"
-                    />
-                    <label>Email</label>
-                    <Field
-                        id='email'
-                        required
-                        name="email"
-                        type="email"
-                    />
-                    <label>Tipo de usuario</label>
-                    <Field
-                    component="select"
-                    id="userRole"
-                    name="userRole"
-                    multiple={false}
-                    >
-                        {roles.map((role) => (
-                            <option value={role.id}>{role.name}</option>
-                        ))}
-                    </Field>
+                    <div className="form-group mb-3">
+                        <FormLabel htmlFor="username">Nombre de usuario:</FormLabel>
+                        <Field className="form-control"
+                            id='username'
+                            required
+                            name="username"
+                            type="text"
+                        />
+                    </div>
+                    <div className="form-group mb-3">
+                        <FormLabel htmlFor='password'>Contraseña:</FormLabel>
+                        <Field className="form-control"
+                            id='password'
+                            required
+                            name="password"
+                            type="password"
+                        />
+                    </div>
+                    <div className="form-group mb-3">
+                        <FormLabel htmlFor='email'>Email</FormLabel>
+                        <Field className="form-control"
+                            id='email'
+                            required
+                            name="email"
+                            type="email"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <FormLabel htmlFor='userRole'>Tipo de usuario</FormLabel>
+                        <Field className="form-control"
+                        component="select"
+                        id="userRole"
+                        name="userRole"
+                        multiple={false}
+                        >
+                            {roles.map((role) => (
+                                <option value={role.id}>{role.name}</option>
+                            ))}
+                        </Field>
+                    </div>
                     <br/>
                     {/* <Form.Label>Suscripciones</Form.Label>
                     <Table bordered hover>
