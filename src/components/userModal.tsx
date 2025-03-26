@@ -5,7 +5,8 @@ import { Role } from '../entities/roleEntity';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
-import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext } from 'formik';
+import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface EditModalProps {
@@ -25,9 +26,9 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     useEffect(() => {
         fetching().then(function () {
             if (initialData) {
-                setFormData(initialData.clone());
+                //setFormData(initialData);
             } else {
-                setFormData(new User());
+                //setFormData(new User());
             }
         });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,57 +122,72 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         handleClose();
     }
 
+    const required = "Valor requerido";
+
     //TODO Realizar las comprobaciones en los inputs, ademas agregar opciones predefinidas para evitar asignaciones nulas.
     return (
-        <Modal show={show} onHide={() => {initialData = new User(); handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={show} onHide={() => {handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
-                <Modal.Title>{initialData ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
+                <Modal.Title>{initialData.id ? 'Editar Usuario' : 'Agregar Usuario'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
             <Formik
-                initialValues= { {user: new User()} }
+                initialValues= { initialData ? {...initialData, role: initialData.role?.id} : {...(new User()), role:"0"} }
                 onSubmit={(values, {setSubmitting}) => { console.log(values) }}
+                validationSchema= {
+                    Yup.object().shape({
+                        username: Yup.string().required(required),
+                        password: Yup.string().required(required),
+                        email: Yup.string().required(required).email("Ingrese un email valido"),
+                        role: Yup.string().required(required).notOneOf(["0"], required)
+                    })
+                }
             >
                 <Form>
                     <div className="form-group mb-3">
-                        <FormLabel htmlFor="username">Nombre de usuario:</FormLabel>
+                        <FormLabel htmlFor="username">Nombre de usuario</FormLabel>
                         <Field className="form-control"
                             id='username'
-                            required
                             name="username"
                             type="text"
+                            placeholder="Ingrese un nombre de usuario"
                         />
+                        <ErrorMessage className='text-danger' name="username" component="div" />
                     </div>
                     <div className="form-group mb-3">
-                        <FormLabel htmlFor='password'>Contraseña:</FormLabel>
+                        <FormLabel htmlFor='password'>Contraseña</FormLabel>
                         <Field className="form-control"
                             id='password'
-                            required
                             name="password"
                             type="password"
+                            placeholder="Ingrese una contraseña"
                         />
+                        <ErrorMessage className='text-danger' name="password" component="div" />
                     </div>
                     <div className="form-group mb-3">
                         <FormLabel htmlFor='email'>Email</FormLabel>
                         <Field className="form-control"
                             id='email'
-                            required
                             name="email"
                             type="email"
+                            placeholder="Ingrese un email"
                         />
+                        <ErrorMessage className='text-danger' name="email" component="div" />
                     </div>
                     <div className="form-group">
-                        <FormLabel htmlFor='userRole'>Tipo de usuario</FormLabel>
+                        <FormLabel htmlFor='role'>Tipo de usuario</FormLabel>
                         <Field className="form-control"
                         component="select"
-                        id="userRole"
-                        name="userRole"
+                        id="role"
+                        name="role"
                         multiple={false}
                         >
+                            <option value={"0"}>Seleccione un valor</option>
                             {roles.map((role) => (
                                 <option value={role.id}>{role.name}</option>
                             ))}
                         </Field>
+                        <ErrorMessage className='text-danger' name="role" component="div" />
                     </div>
                     <br/>
                     {/* <Form.Label>Suscripciones</Form.Label>
@@ -238,7 +254,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                     <br/>
                     <div className='text-center'>
                         <Button className="mx-auto" variant="primary" type="submit">
-                            {initialData ? 'Guardar cambios' : 'Agregar'}
+                            {initialData.id ? 'Guardar cambios' : 'Agregar'}
                         </Button>
                     </div>
                 </Form>
