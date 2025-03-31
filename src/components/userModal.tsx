@@ -5,9 +5,10 @@ import { Role } from '../entities/roleEntity';
 import { RoleRepository } from '../repositories/RoleRepository';
 import { Subscription } from '../entities/subscriptionEntity';
 import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
-import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext, ErrorMessage } from 'formik';
+import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext, ErrorMessage, FieldArray, insert } from 'formik';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { DatePickerFormik } from './dataPickerFormik.tsx';
 
 interface EditModalProps {
     show: boolean;
@@ -21,7 +22,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     const [formData, setFormData] = useState<User>(new User()); //Objeto a pasar al padre, contiene todos los datos y se usa para el manejo de datos primitivos
     //Collections data
     const [roles, setRoles] = useState<Role[]>([]);
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [subscriptionsTypes, setSubscriptions] = useState<Subscription[]>([]);
 
     useEffect(() => {
         fetching().then(function () {
@@ -60,7 +61,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     function handleSubscriptionChange(index:number, e: React.ChangeEvent<HTMLSelectElement>) {
         const { value } = e.target;
         const tmpSub = formData.subscriptions;
-        tmpSub[index].subscription = subscriptions.find(sub => sub.id == value)!;
+        tmpSub[index].subscription = subscriptionsTypes.find(sub => sub.id == value)!;
         setFormData({...formData, subscriptions: tmpSub} as User);
     }
 
@@ -139,10 +140,12 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         username: Yup.string().required(required),
                         password: Yup.string().required(required),
                         email: Yup.string().required(required).email("Ingrese un email valido"),
-                        role: Yup.string().required(required).notOneOf(["0"], required)
+                        role: Yup.string().required(required).notOneOf(["0"], required),
+                        subscriptions: Yup.array().min(1, "Debe tener al menos una subscripcion"),
                     })
                 }
             >
+            {({values}) => (
                 <Form>
                     <div className="form-group mb-3">
                         <FormLabel htmlFor="username">Nombre de usuario</FormLabel>
@@ -174,9 +177,9 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         />
                         <ErrorMessage className='text-danger' name="email" component="div" />
                     </div>
-                    <div className="form-group">
+                    <div className="form-group mb-3">
                         <FormLabel htmlFor='role'>Tipo de usuario</FormLabel>
-                        <Field className="form-control"
+                        <Field className="form-select"
                         component="select"
                         id="role"
                         name="role"
@@ -189,68 +192,70 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         </Field>
                         <ErrorMessage className='text-danger' name="role" component="div" />
                     </div>
-                    <br/>
-                    {/* <Form.Label>Suscripciones</Form.Label>
-                    <Table bordered hover>
-                        <thead>
-                            <tr>
-                                <th>Tipo de Suscripción</th>
-                                <th>Fecha de Inicio</th>
-                                <th>Fecha de Fin</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className='text-center'>
-                            {formData.subscriptions.map((sub, index) => (
-                            <tr key={index}>
-                                <td>
-                                <Form.Select
-                                    value={sub.subscription?.id}
-                                    onChange={(e) => handleSubscriptionChange(index, e)}
-                                >
-                                    <option value="0">Seleccionar</option>
-                                    {subscriptions.map((sbc) => (
-                                    <option key={sbc.id} value={sbc.id}>
-                                        {sbc.type}
-                                    </option>
+                    <div className="form-group mb-3">
+                        <FormLabel htmlFor='subscriptions'>Historial de subscripciones</FormLabel>
+                        <Table bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de Suscripción</th>
+                                    <th>Fecha de Inicio</th>
+                                    <th>Fecha de Fin</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody className='text-center'>
+                                <FieldArray
+                                name="subscriptions"
+                                render={ arrayHelpers => (
+                                <> {values.subscriptions.map((_usrSub, index) => (
+                                        <tr key={index}>
+                                            <td>
+                                                <Field className="form-select"
+                                                component="select"
+                                                name={`subscriptions[${index}].subscription.id`}
+                                                multiple={false}
+                                                >
+                                                    <option value={"0"}>Seleccione un valor</option>
+                                                    {subscriptionsTypes.map((subType) => (
+                                                        <option value={subType.id}>{subType.type}</option>
+                                                    ))}
+                                                </Field>
+                                            </td>
+                                            <td>
+                                                <Field className="form-control"
+                                                name={`subscriptions[${index}].startDate`}
+                                                component={DatePickerFormik}
+                                                />
+                                            </td>
+                                            <td>
+                                                <Field className="form-control"
+                                                name={`subscriptions[${index}].endDate`}
+                                                component={DatePickerFormik}
+                                                />
+                                            </td>
+                                            <td>
+                                                <button className='btn btn-danger' type="button" onClick={() => arrayHelpers.remove(index)}>
+                                                    Eliminar
+                                                </button>
+                                            </td>
+                                        </tr>
                                     ))}
-                                </Form.Select>
-                                </td>
-                                <td>
-                                <Form.Control
-                                    name="startDate"
-                                    type="date"
-                                    value={sub.startDate.toLocaleDateString('en-CA')}
-                                    onChange={(e) => handleDateChange(index, e)}
+                                    <tr className='text-left'>
+                                        <td colSpan={4}>
+                                            <button className='btn btn-sm btn-success'
+                                            type="button"
+                                            onClick={() => arrayHelpers.push({ subscription: {}, startDate: Date.now(), endDate: Date.now() })}
+                                            >
+                                                Agregar Suscripción
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </>)}
                                 />
-                                </td>
-                                <td>
-                                <Form.Control
-                                    name="endDate"
-                                    type="date"
-                                    value={sub.endDate.toLocaleDateString('en-CA')}
-                                    onChange={(e) => handleDateChange(index, e)}
-                                />
-                                </td>
-                                <td>
-                                <Button
-                                    variant="danger"
-                                    onClick={() => handleSubscriptionDelete(index)}
-                                >
-                                    Eliminar
-                                </Button>
-                                </td>
-                            </tr>
-                            ))}
-                            <tr className='text-left'>
-                                <td colSpan={4}>
-                                    <Button className="" size="sm" variant="success" onClick={handleSubscriptionAdd}>
-                                        Agregar Suscripción
-                                    </Button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </Table> */}
+                            </tbody>
+                        </Table>
+                        <ErrorMessage className='text-danger' name="subscriptions" component="div" />
+                    </div>
                     <br/>
                     <div className='text-center'>
                         <Button className="mx-auto" variant="primary" type="submit">
@@ -258,6 +263,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         </Button>
                     </div>
                 </Form>
+            )}
             </Formik>
           </Modal.Body>
         </Modal>
