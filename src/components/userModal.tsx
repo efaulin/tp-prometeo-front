@@ -152,7 +152,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                     })
                 }
             >
-            {({values}) => (
+            {({values, errors}) => (
                 <Form>
                     <div className="form-group mb-3">
                         <FormLabel htmlFor="username">Nombre de usuario</FormLabel>
@@ -222,7 +222,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                             <td>
                                                 <Field className="form-select"
                                                 component="select"
-                                                name={`${fieldName}.id`}
+                                                name={`${fieldName}.subscription`}
                                                 multiple={false}
                                                 >
                                                     <option value={"0"}>Seleccione un valor</option>
@@ -230,7 +230,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                                         <option value={subType.id}>{subType.type}</option>
                                                     ))}
                                                 </Field>
-                                                <ErrorMessage className='text-danger' name={`${fieldName}.name`} component="div" />
+                                                <ErrorMessage className='text-danger' name={`${fieldName}.subscription`} component="div" />
                                             </td>
                                             <td>
                                                 <Field className="form-control"
@@ -258,7 +258,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                         <td colSpan={4}>
                                             <button className='btn btn-sm btn-success'
                                             type="button"
-                                            onClick={() => arrayHelpers.push({ subscription: { id: "0" }, startDate: Date.now(), endDate: Date.now() })}
+                                            onClick={() => arrayHelpers.push({ subscription: "0", startDate: Date.now(), endDate: Date.now() })}
                                             >
                                                 Agregar Suscripción
                                             </button>
@@ -268,7 +268,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                 />
                             </tbody>
                         </Table>
-                        {/* <ErrorMessage className='text-danger' name="subscriptions" component="div" /> */}
+                        {typeof(errors.subscriptions) == 'string' ? <ErrorMessage className='text-danger' name="subscriptions" component="div" /> : undefined}
                     </div>
                     <br/>
                     <div className='text-center'>
