@@ -133,7 +133,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
             </Modal.Header>
             <Modal.Body>
             <Formik
-                initialValues= { initialData ? {...initialData, role: initialData.role?.id} : {...(new User()), role:"0"} }
+                initialValues= { initialData ? {...initialData, role: initialData.role?.id, subscriptions: initialData.subscriptions.map((usrSpc) => { return {...usrSpc, subscription: usrSpc.subscription?.id} })} : {...(new User()), role:"0"} }
                 onSubmit={(values, {setSubmitting}) => { console.log(values) }}
                 validationSchema= {
                     Yup.object().shape({
@@ -141,14 +141,14 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         password: Yup.string().required(required),
                         email: Yup.string().required(required).email("Ingrese un email valido"),
                         role: Yup.string().required(required).notOneOf(["0"], required),
-                        subscriptions: Yup.array().min(1, "Debe tener al menos una subscripcion").of(
-                            Yup.object().shape({
-                                subscription: Yup.object().required(required).shape({
-                                    id: Yup.string().required(required).notOneOf(["0"], required),
-                                }), //FIXME Problemas
-                                //FIX aaaaa
+                        subscriptions: Yup.array().of(
+                            Yup.object({
+                                subscription: Yup.string().required(required).notOneOf(["0"], required),
+                                startDate: Yup.number().required(required),
+                                endDate: Yup.number().required(required),
+                                //FIXME Problemas
                             }),
-                        ),
+                        ).min(1, "Debe tener al menos una subscripcion"),
                     })
                 }
             >
@@ -214,12 +214,15 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                 <FieldArray
                                 name="subscriptions"
                                 render={ arrayHelpers => (
-                                <> {values.subscriptions.map((_usrSub, index) => (
-                                        <tr key={index}>
+                                <> {values.subscriptions.map((_usrSub, index) => {
+                                    const fieldName = `subscriptions[${index}]`;
+
+                                    return (
+                                        <tr>
                                             <td>
                                                 <Field className="form-select"
                                                 component="select"
-                                                name={`subscriptions[${index}].subscription.id`}
+                                                name={`${fieldName}.id`}
                                                 multiple={false}
                                                 >
                                                     <option value={"0"}>Seleccione un valor</option>
@@ -227,18 +230,21 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                                         <option value={subType.id}>{subType.type}</option>
                                                     ))}
                                                 </Field>
+                                                <ErrorMessage className='text-danger' name={`${fieldName}.name`} component="div" />
                                             </td>
                                             <td>
                                                 <Field className="form-control"
-                                                name={`subscriptions[${index}].startDate`}
+                                                name={`${fieldName}.startDate`}
                                                 component={DatePickerFormik}
                                                 />
+                                                <ErrorMessage className='text-danger' name={`${fieldName}.startDate`} component="div" />
                                             </td>
                                             <td>
                                                 <Field className="form-control"
-                                                name={`subscriptions[${index}].endDate`}
+                                                name={`${fieldName}.endDate`}
                                                 component={DatePickerFormik}
                                                 />
+                                                <ErrorMessage className='text-danger' name={`${fieldName}.endDate`} component="div" />
                                             </td>
                                             <td>
                                                 <button className='btn btn-danger' type="button" onClick={() => arrayHelpers.remove(index)}>
@@ -246,12 +252,13 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                                 </button>
                                             </td>
                                         </tr>
-                                    ))}
+                                    );
+                                })}
                                     <tr className='text-left'>
                                         <td colSpan={4}>
                                             <button className='btn btn-sm btn-success'
                                             type="button"
-                                            onClick={() => arrayHelpers.push({ subscription: {}, startDate: Date.now(), endDate: Date.now() })}
+                                            onClick={() => arrayHelpers.push({ subscription: { id: "0" }, startDate: Date.now(), endDate: Date.now() })}
                                             >
                                                 Agregar Suscripción
                                             </button>
@@ -261,7 +268,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                 />
                             </tbody>
                         </Table>
-                        <ErrorMessage className='text-danger' name="subscriptions" component="div" />
+                        {/* <ErrorMessage className='text-danger' name="subscriptions" component="div" /> */}
                     </div>
                     <br/>
                     <div className='text-center'>
