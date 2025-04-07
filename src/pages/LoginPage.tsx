@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "../utils/useAuth";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import toast from "react-hot-toast";
-
+import axiosInstance from "../utils/axiosInstance";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ export const LoginPage = () => {
     e.preventDefault();
     try {
       // Enviar los datos de login al backend
-      const response = await axios.post("http://localhost:3005/api/auth/login", {
+      const response = await axiosInstance.post(`/auth/login`, {
         username,
         password,
       });

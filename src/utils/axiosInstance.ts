@@ -8,7 +8,7 @@ const getAuthToken = (): string | null => {
 
 // Crear una instancia de Axios
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3005/api/', // Cambia esto a tu servidor backend
+  baseURL: 'https://psychic-pancake-qj5gvx544qfwq9-3005.app.github.dev/api/', // Cambia esto a tu servidor backend
 });
 
 // Interceptor para agregar el token a cada solicitud

@@ -141,7 +141,14 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         password: Yup.string().required(required),
                         email: Yup.string().required(required).email("Ingrese un email valido"),
                         role: Yup.string().required(required).notOneOf(["0"], required),
-                        subscriptions: Yup.array().min(1, "Debe tener al menos una subscripcion"),
+                        subscriptions: Yup.array().min(1, "Debe tener al menos una subscripcion").of(
+                            Yup.object().shape({
+                                subscription: Yup.object().required(required).shape({
+                                    id: Yup.string().required(required).notOneOf(["0"], required),
+                                }), //FIXME Problemas
+                                //FIX aaaaa
+                            }),
+                        ),
                     })
                 }
             >

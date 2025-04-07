@@ -11,6 +11,8 @@ import ChaptersPage from "./pages/chaptersPage";
 import { Toaster } from "react-hot-toast";
 import NavBar from "./pages/Navbar";
 
+//TODO Agregar validacion de caducidad del token.
+
 function App() {
   return (
     <AuthProvider>
