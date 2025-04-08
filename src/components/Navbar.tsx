@@ -16,7 +16,7 @@ function NavBar() {
         logout(); // Llama a la función de logout del contexto
         navigate('/'); // Redirige al login después de hacer logout
     };
-    console.log(user)
+    
     return (
         <Navbar expand="lg" className="bg-body-tertiary" bg="dark" data-bs-theme="dark">
         <Container fluid>
@@ -30,8 +30,8 @@ function NavBar() {
             >
                 <Nav.Link as={Link} to="/">Home</Nav.Link>
                 <NavDropdown title="CRUDS" id="navbarScrollingDropdown">
-                <NavDropdown.Item as={Link} to="/users">Users</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/idiomas">Idiomas</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/users">Usuarios</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/languages">Idiomas</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/narradores">Narradores</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/chapters">Capitulos</NavDropdown.Item>
                 </NavDropdown>

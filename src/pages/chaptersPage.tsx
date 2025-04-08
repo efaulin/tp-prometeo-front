@@ -42,33 +42,33 @@ const ChaptersPage: React.FC = () => {
     }, []);
   
     const fetchChapters = async () => {
-      const response = await axiosInstance.get('/capitulo');
+      const response = await axiosInstance.get('/chapter');
       console.log(response);
       setChapters(response.data);
     };
 
     const fetchLanguages = async () => {
-      const response = await axiosInstance.get('/idioma');
+      const response = await axiosInstance.get('/language');
       setLanguages(response.data);
     };
 
     const fetchNarrators = async () => {
-      const response = await axiosInstance.get('/narrador');
+      const response = await axiosInstance.get('/narrator');
       setNarrators(response.data);
     };
 
     const fetchAuthors = async () => {
-      const response = await axiosInstance.get('/autor');
+      const response = await axiosInstance.get('/author');
       setAuthors(response.data);
     };
 
     const fetchHosts = async () => {
-      const response = await axiosInstance.get('/conductor');
+      const response = await axiosInstance.get('/host');
       setHosts(response.data);
     };
 
     const fetchCollections = async () => {
-      const response = await axiosInstance.get('/coleccion');
+      const response = await axiosInstance.get('/collection');
       setCollections(response.data);
     };
 

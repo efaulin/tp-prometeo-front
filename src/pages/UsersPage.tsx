@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button } from 'react-bootstrap';
 import { User } from '../entities/userEntity';
 import { UserRepository } from '../repositories/UserRepository';
-import { UserDataModal } from '../components/userModal';
+import { UserDataModal } from '../components/modals/userModal';
 import { ConfirmationModal } from '../components/confirmationModal';
 import toast from 'react-hot-toast';
 
@@ -26,7 +26,7 @@ const UsersPage: React.FC = () => {
       doubleToastControl = true;
       setShowLoading(true);
       toast.promise(
-        UserRepository.GetAll().then((users) => {setUsers(users); doubleToastControl = false;}, (error) => {console.log(error); toast.error("Hubo un error: " + error.toString())}).finally(() => {setShowLoading(false)}),
+        UserRepository.GetAll().then((users) => {setUsers(users); doubleToastControl = false;}, (error) => {console.log(error); toast.error("Hubo un error: " + error.toString()); setUsers([])}).finally(() => {setShowLoading(false)}),
         {
           loading: 'Adquiriendo usuarios...',
           success: undefined,
@@ -115,7 +115,7 @@ const UsersPage: React.FC = () => {
     return (
       <div>
         <h2>Usuarios</h2>
-        <Button onClick={handleAddUser}>Agregar Usuario</Button>
+        <Button onClick={handleAddUser}>Agregar usuario</Button>
         {
           showLoading ?
           //showLoading = TRUE
@@ -137,8 +137,8 @@ const UsersPage: React.FC = () => {
                 <td>{user.email}</td>
                 <td>{user.role ? user.role.name : "RoleDeleted"}</td>
                 <td>
-                  <Button variant="light" style={{backgroundColor:'#ced4da'}} onClick={() => handleEditUser(user)}>Editar</Button>{' '}
-                  <Button variant="danger" onClick={() => handleDeleteModal(user)}>Eliminar</Button>
+                  <Button variant="primary" onClick={() => handleEditUser(user)}><i className="bi bi-pencil-fill"></i></Button>{' '}
+                  <Button variant="danger" onClick={() => handleDeleteModal(user)}><i className="bi bi-trash-fill"></i></Button>
                 </td>
               </tr>
             ))}
@@ -150,7 +150,7 @@ const UsersPage: React.FC = () => {
         <UserDataModal
           show={showUserModal}
           handleClose={() => setShowUserModal(false)}
-          handleSave={(user) => {handleSave(user); console.log(user);}}
+          handleSave={(user) => {handleSave(user);}}
           initialData={selectedUser}
         />
 
@@ -158,8 +158,7 @@ const UsersPage: React.FC = () => {
         <ConfirmationModal
           show={showDeleteModal}
           handleClose={() => setShowDeleteModal(false)}
-          handleSubmit={(e:React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
+          handleSubmit={() => {
             handleDeleteUser(selectedUser.id ? selectedUser!.id! : "0");
             setShowDeleteModal(false);
           }}

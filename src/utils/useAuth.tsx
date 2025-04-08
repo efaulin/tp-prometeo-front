@@ -14,8 +14,8 @@ export interface AuthData {
 }
 
 interface AuthContextType {
-  user: UserAuthData; // Cambia `any` al tipo específico de usuario si lo tienes
-  login: (data: UserAuthData) => void; // Cambia `any` si tienes un tipo específico para `data`
+  user: UserAuthData;
+  login: (data: UserAuthData) => void;
   logout: () => void;
 }
 

@@ -5,11 +5,11 @@ import { Secret } from "./pages/Secret";
 import { ProtectedRoute } from "./pages/ProtectedRoute";
 import { AuthProvider } from "./utils/useAuth";
 import UsersPage from "./pages/UsersPage";
-import IdiomaPage from "./pages/IdiomaPage";
 import NarradorPage from "./pages/NarradorPage";
 import ChaptersPage from "./pages/chaptersPage";
 import { Toaster } from "react-hot-toast";
-import NavBar from "./pages/Navbar";
+import NavBar from "./components/Navbar";
+import LanguagesPage from "./pages/LanguagePage";
 
 //TODO Agregar validacion de caducidad del token.
 
@@ -40,10 +40,10 @@ function App() {
             }
           />,
           <Route
-            path="/idiomas"
+            path="/languages"
             element={
               <ProtectedRoute>
-                <IdiomaPage />
+                <LanguagesPage />
               </ProtectedRoute>
               
             }

@@ -3,7 +3,7 @@ import { Modal, Form, Button } from 'react-bootstrap';
 interface ConfirmationModalProps {
     show: boolean;
     handleClose: () => void;
-    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    handleSubmit: () => void;
     question: string;
     submitButtonText: string;
     submitButtonVariant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
@@ -27,7 +27,7 @@ export function ConfirmationModal({show, handleClose, handleSubmit, question, su
             : ""}
             <br/>
             <div>
-              <Form onSubmit={handleSubmit}>
+              <Form onSubmit={(e) => {e.preventDefault(); handleSubmit()}}>
                 <Form.Group controlId="deleteControl">
                   <Button type='submit' variant={submitButtonVariant}>{submitButtonText}</Button>{' '}
                   <Button variant={cancelButtonVariant} onClick={handleClose}>{cancelButtonText}</Button>

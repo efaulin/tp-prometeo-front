@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Table, FormLabel } from 'react-bootstrap';
-import { User, UserSubscription } from '../entities/userEntity';
-import { Role } from '../entities/roleEntity';
-import { RoleRepository } from '../repositories/RoleRepository';
-import { Subscription } from '../entities/subscriptionEntity';
-import { SubscriptionRepository } from '../repositories/SuscriptionRepository';
-import { Field, useFormik, Form, Formik, FormikHelpers, FormikValues, FormikContext, ErrorMessage, FieldArray, insert } from 'formik';
+import { User, UserSubscription } from '../../entities/userEntity.ts';
+import { Role } from '../../entities/roleEntity.ts';
+import { RoleRepository } from '../../repositories/RoleRepository.ts';
+import { Subscription } from '../../entities/subscriptionEntity.ts';
+import { SubscriptionRepository } from '../../repositories/SuscriptionRepository.ts';
+import { Field, Form, Formik, ErrorMessage, FieldArray } from 'formik';
 import * as Yup from 'yup';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { DatePickerFormik } from './dataPickerFormik.tsx';
+import { DatePickerFormik } from '../dataPickerFormik.tsx';
 
 interface EditModalProps {
     show: boolean;
@@ -23,13 +23,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     const [subscriptionsTypes, setSubscriptions] = useState<Subscription[]>([]);
 
     useEffect(() => {
-        fetching().then(function () {
-            if (initialData) {
-                //setFormData(initialData);
-            } else {
-                //setFormData(new User());
-            }
-        });
+        fetching();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData]);
 
@@ -112,7 +106,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
             </Modal.Header>
             <Modal.Body>
             <Formik
-                initialValues= { initialData ? {...initialData, role: initialData.role?.id, subscriptions: initialData.subscriptions.map((usrSpc) => { return {...usrSpc, subscription: usrSpc.subscription?.id} })} : {...(new User()), role:"0"} }
+                initialValues= { initialData ? {...initialData, role: initialData.role?.id, subscriptions: initialData.subscriptions.map((usrSpc) => { return {...usrSpc, subscription: usrSpc.subscription?.id} })} : {...(new User()), role:"0", subscriptions: []} }
                 onSubmit={handleSubmit}
                 validationSchema= {
                     Yup.object().shape({

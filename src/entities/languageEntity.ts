@@ -10,9 +10,14 @@ export class Language {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name}:LanguageInterface) {
-        this.id = _id;
-        this.name = name;
+    constructor(languageInterface?:LanguageInterface) {
+        if (languageInterface) {
+            this.id = languageInterface._id;
+            this.name = languageInterface.name;
+        } else {
+            this.id = undefined;
+            this.name = "";
+        }
     }
     
     /**
