@@ -18,8 +18,6 @@ interface EditModalProps {
 }
 
 export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, handleSave, initialData}) => {
-    //Modal data
-    const [formData, setFormData] = useState<User>(new User()); //Objeto a pasar al padre, contiene todos los datos y se usa para el manejo de datos primitivos
     //Collections data
     const [roles, setRoles] = useState<Role[]>([]);
     const [subscriptionsTypes, setSubscriptions] = useState<Subscription[]>([]);
@@ -48,46 +46,20 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
         setSubscriptions(await SubscriptionRepository.GetAll());
     }
 
-    function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const { name, value } = e.target;
-        setFormData({...formData, [name]: value} as User);
-    }
-
-    function handleRoleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-        const { value } = e.target;
-        setFormData({...formData, role: roles.find(role => role.id == value)} as User);
-    }
-
-    function handleSubscriptionChange(index:number, e: React.ChangeEvent<HTMLSelectElement>) {
-        const { value } = e.target;
-        const tmpSub = formData.subscriptions;
-        tmpSub[index].subscription = subscriptionsTypes.find(sub => sub.id == value)!;
-        setFormData({...formData, subscriptions: tmpSub} as User);
-    }
-
-    function handleDateChange(index:number, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        const { name, value } = e.target;
-        const tmpSub = formData.subscriptions;
-        if (name == "startDate") {tmpSub[index].startDate = new Date(value)}
-        else if (name == "endDate") {tmpSub[index].endDate = new Date(value)}
-        else {throw "Error de nombre"};
-        setFormData({...formData, subscriptions: tmpSub} as User);
-    }
-
-    function handleSubscriptionDelete(index:number) {
-        const tmpSub = formData.subscriptions;
-        tmpSub.splice(index, 1);
-        setFormData({...formData, subscriptions: tmpSub} as User);
-    }
-
-    function handleSubscriptionAdd() {
-        const tmpSub = formData.subscriptions;
-        tmpSub.push(new UserSubscription());
-        setFormData({...formData, subscriptions: tmpSub} as User);
-    }
-
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    function handleSubmit(
+        formData: {
+            role: string | undefined;
+            subscriptions: {
+                subscription: string | undefined;
+                startDate: Date;
+                endDate: Date;
+            }[];
+            id?: string;
+            username: string;
+            password: string;
+            email: string;
+        }
+    ) {
         if (initialData.id) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updateFields: any = {};
@@ -95,16 +67,16 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
             if (formData.username != initialData.username) updateFields.username = formData.username;
             if (formData.password != initialData.password) updateFields.password = formData.password;
             if (formData.email != initialData.email) updateFields.email = formData.email;
-            if (formData.role?.id != initialData.role?.id) updateFields.role = formData.role;
+            if (formData.role != initialData.role?.id) updateFields.role = roles.find((_role) => _role.id == formData.role);
             //Si cambia el tamaño de los arrays o su contenido, actualizo la propiedad "Subscriptions"
             if (formData.subscriptions.length != initialData.subscriptions.length) {
-                updateFields.subscriptions = formData.subscriptions;
+                updateFields.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
             } else {
                 //Logica para revisar cambios en el array de "Subscripciones".
                 let isDifferent = false;
                 for (let i=0; i < formData.subscriptions.length && !isDifferent; i++) {
                     //"formData.subscriptions" son las subscripciones que ingresa/modifica el usuario en el modal.
-                    const formDataScrp = formData.subscriptions[i].toAPI();
+                    const formDataScrp = {startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: formData.subscriptions[i].subscription};
                     let wasFound = false;
                     //Por cada UsuarioSuscripcion de "formData.subscriptions" reviso este contenida en "initialData.subscriptions".
                     for (let z=0; z < initialData.subscriptions.length && !wasFound; z++) {
@@ -114,19 +86,25 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                     }
                     if (!wasFound) isDifferent = true;
                 }
-                if (isDifferent) updateFields.subscriptions = formData.subscriptions;
+                if (isDifferent) updateFields.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
             }
             handleSave(updateFields);
         } else {
-            handleSave(formData);
+            const newUser = new User();
+            newUser.username = formData.username;
+            newUser.password = formData.password;
+            newUser.email = formData.email;
+            newUser.role = roles.find((_role) => _role.id == formData.role)!;
+            newUser.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
+            handleSave(newUser);
         }
         handleClose();
     }
 
+    //Textos para las validaciones.
     const required = "Valor requerido";
     const oneDayMore = "La fecha de finalización debe ser posterior a la fecha de inicio";
 
-    //TODO Realizar las comprobaciones en los inputs, ademas agregar opciones predefinidas para evitar asignaciones nulas.
     return (
         <Modal show={show} onHide={() => {handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
@@ -135,7 +113,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
             <Modal.Body>
             <Formik
                 initialValues= { initialData ? {...initialData, role: initialData.role?.id, subscriptions: initialData.subscriptions.map((usrSpc) => { return {...usrSpc, subscription: usrSpc.subscription?.id} })} : {...(new User()), role:"0"} }
-                onSubmit={(values, {setSubmitting}) => { console.log(values) }}
+                onSubmit={handleSubmit}
                 validationSchema= {
                     Yup.object().shape({
                         username: Yup.string().required(required),
