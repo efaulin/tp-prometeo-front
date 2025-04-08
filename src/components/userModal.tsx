@@ -124,6 +124,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
     }
 
     const required = "Valor requerido";
+    const oneDayMore = "La fecha de finalización debe ser posterior a la fecha de inicio";
 
     //TODO Realizar las comprobaciones en los inputs, ademas agregar opciones predefinidas para evitar asignaciones nulas.
     return (
@@ -144,9 +145,13 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                         subscriptions: Yup.array().of(
                             Yup.object({
                                 subscription: Yup.string().required(required).notOneOf(["0"], required),
-                                startDate: Yup.number().required(required),
-                                endDate: Yup.number().required(required),
-                                //FIXME Problemas
+                                startDate: Yup.date().required(required),
+                                endDate: Yup.date().required(required)
+                                    .test("min-date", oneDayMore, function (endDate) {
+                                        const startDate = this.parent.startDate;
+                                        //Verifica que endDate sea mayor a startDate. (no se usa ".min" porque permite que sea igual)
+                                        return endDate > startDate;
+                                    }),
                             }),
                         ).min(1, "Debe tener al menos una subscripcion"),
                     })
@@ -258,7 +263,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
                                         <td colSpan={4}>
                                             <button className='btn btn-sm btn-success'
                                             type="button"
-                                            onClick={() => arrayHelpers.push({ subscription: "0", startDate: Date.now(), endDate: Date.now() })}
+                                            onClick={() => arrayHelpers.push({ subscription: "0", startDate: new Date, endDate: new Date })}
                                             >
                                                 Agregar Suscripción
                                             </button>
