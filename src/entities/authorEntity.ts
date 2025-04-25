@@ -10,9 +10,14 @@ export class Author {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name}:AuthorInterface) {
-        this.id = _id;
-        this.name = name;
+    constructor(authorInterface?:AuthorInterface) {
+        if (authorInterface) {
+            this.id = authorInterface._id;
+            this.name = authorInterface.name;
+        } else {
+            this.id = undefined;
+            this.name = "";
+        }
     }
     
     /**

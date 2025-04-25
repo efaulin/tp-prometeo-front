@@ -54,6 +54,7 @@ export const UserDataModal : React.FC<EditModalProps> = ({show, handleClose, han
             email: string;
         }
     ) {
+        //TODO Revisar si se puede hacer una solucion mas simple utilizando la propiedad "touched" de formik.
         if (initialData.id) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const updateFields: any = {};

@@ -8,12 +8,17 @@ export class CollectionRepository {
     }
 
     static async Create(obj:Collection): Promise<Collection> {
+        console.log(obj);
         const response = await axiosInstance.post(`/collection`, obj.toAPI());
         return (new Collection(response.data));
     }
 
-    static async Update(obj:Collection): Promise<Collection> {
-        const response = await axiosInstance.put(`/collection/${obj.id!}`, obj.toAPI());
+    static async Update(obj:Partial<Collection>): Promise<Collection> {
+        const updateFields: any = {};
+        if (obj.name) updateFields.name = obj.name;
+        if (obj.description) updateFields.description = obj.description;
+        if (obj.categoriesRef) updateFields.categoriesRef = obj.categoriesRef.map(_category => _category.id!);
+        const response = await axiosInstance.put(`/collection/${obj.id!}`, updateFields);
         return (new Collection(response.data));
     }
 

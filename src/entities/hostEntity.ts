@@ -10,9 +10,14 @@ export class Host {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name}:HostInterface) {
-        this.id = _id;
-        this.name = name;
+    constructor(hostInterface?:HostInterface) {
+        if (hostInterface) {
+            this.id = hostInterface._id;
+            this.name = hostInterface.name;
+        } else {
+            this.id = undefined;
+            this.name = "";
+        }
     }
     
     /**

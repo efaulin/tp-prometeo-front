@@ -1,4 +1,3 @@
-// axiosInstance.ts
 import axios from 'axios';
 
 // Recuperar el token del localStorage (o sessionStorage)
@@ -8,7 +7,7 @@ const getAuthToken = (): string | null => {
 
 // Crear una instancia de Axios
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3005/api/', // Cambia esto a tu servidor backend
+  baseURL: 'https://super-duper-cod-xq9p9jj994jh657w-3005.app.github.dev/api/v0.1/',
 });
 
 // Interceptor para agregar el token a cada solicitud
@@ -31,7 +30,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Si el token es inválido o caducado, redirigir al login
       localStorage.removeItem('token');
-      window.location.href = '/login'; // Redirigir al login
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

@@ -16,19 +16,26 @@ export class Collection {
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).
      */
-    constructor({_id, name, description, categoriesRef}:CollectionInterface) {
-        this.id = _id;
-        this.name = name;
-        this.description = description;
+    constructor(collectionInterface?:CollectionInterface) {
+        if (collectionInterface) {
+            this.id = collectionInterface._id;
+            this.name = collectionInterface.name;
+            this.description = collectionInterface.description;
 
-        const tmpCategoriesArray : Category[] = [];
-        categoriesRef.forEach((ctgInt) => {
-            const tmpCtg = Category.Parse(ctgInt);
-            if (tmpCtg) {
-                tmpCategoriesArray.push(tmpCtg);
-            }
-        })
-        this.categoriesRef = tmpCategoriesArray;
+            const tmpCategoriesArray : Category[] = [];
+            collectionInterface.categoriesRef.forEach((ctgInt) => {
+                const tmpCtg = Category.Parse(ctgInt);
+                if (tmpCtg) {
+                    tmpCategoriesArray.push(tmpCtg);
+                }
+            })
+            this.categoriesRef = tmpCategoriesArray;
+        } else {
+            this.id = undefined;
+            this.name = "";
+            this.description = "";
+            this.categoriesRef = [];
+        }
     }
     
     /**
@@ -52,7 +59,7 @@ export class Collection {
         return {
             name: this.name,
             description: this.description,
-            categories: this.categoriesRef.map(ctg => ctg.id!),
+            categoriesRef: this.categoriesRef.map(ctg => ctg.id!),
         };
     }
 }

@@ -9,7 +9,7 @@ export const DatePickerFormik = ({ field, form }) => {
       toggleCalendarOnIconClick
       selected={field.value}
       onChange={(date) => form.setFieldValue(field.name, date)}
-      className="form-control btn"
+      className="form-control btn border"
       dateFormat="dd/MM/yyyy"
     />
   );

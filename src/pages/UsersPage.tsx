@@ -73,7 +73,7 @@ const UsersPage: React.FC = () => {
         }
       );
     };
-
+    //FIX Hay problemas con la validacion "nombre de usuario repetido"
     const handleSave = async (user: User | Partial<User>) => {
       if (user.id) {
         toast.promise(
