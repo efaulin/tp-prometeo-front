@@ -9,7 +9,22 @@ export class ChapterRepository {
     }
 
     static async Create(obj:Chapter): Promise<Chapter> {
-        const response = await axiosInstance.post(`/chapter`, obj.toAPI());
+        const updateFilds: any = {};
+        if (obj.name) updateFilds.name = obj.name;
+        if (obj.collectionId) updateFilds.collectionRef = obj.collectionId;
+        if (obj.description) updateFilds.description = obj.description;
+        if (obj.publicationDate) updateFilds.publicationDate = obj.publicationDate.toISOString();
+        if (obj.languageRef) updateFilds.languageRef = obj.languageRef!.id!;
+        if (obj.isAudiobook()) {
+            //Audiolibro -> Authors & Narrator
+            if (obj.getAuthors()) updateFilds.authorsRef = obj.getAuthors()!.map(ath => ath.id!);
+            if (obj.getNarrator()) updateFilds.narratorRef = obj.getNarrator()!.id!;
+        } else {
+            //Podcast -> Hosts
+            if (obj.getHosts()) updateFilds.hostsRef = obj.getHosts()!.map(hst => hst.id!);
+        }
+        
+        const response = await axiosInstance.post(`/chapter`, updateFilds);
         return (new Chapter(response.data));
     }
 

@@ -100,45 +100,42 @@ const ChaptersPage: React.FC = () => {
 
     const handleSave = async (chapter: Chapter | Partial<Chapter>) => {
       console.log(chapter);
+      if (chapter.id) {
+        toast.promise(
+          ChapterRepository.Update(chapter).then(fetchChapters, (error) => {console.log(error);}),
+          {
+            loading: 'Guardando...',
+            success: <b>¡Capitulo modificado!</b>,
+            error: (err) => (<span><b>Hubo un error:</b><br/>{err.toString()}</span>),
+          },
+          {
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            }
+          }
+        );
+      } else {
+        toast.promise(
+          ChapterRepository.Create(chapter as Chapter).then(fetchChapters, (error) => {console.log(error);}),
+          {
+            loading: 'Guardando...',
+            success: <b>¡Capitulo creado!</b>,
+            error: (err) => (<span><b>Hubo un error:</b><br/>{err.toString()}</span>),
+          },
+          {
+            success: {
+              duration: 3000,
+            },
+            error: {
+              duration: 5000,
+            }
+          }
+        );
+      }
     }
-  
-    // const handleSubmit = async (event: React.FormEvent) => {
-    //   event.preventDefault();
-    //   console.log(selectedChapter);
-    //   if (selectedChapter!._id != "0") {
-    //     // Editar usuario
-    //     const updChapter = {
-    //       coleccionId: selectedCollection?._id,
-    //       name: selectedChapter?.name,
-    //       hosts: [hosts[0]._id],
-    //       durationInSeconds: selectedChapter?.durationInSeconds,
-    //       language: selectedLanguage?._id,
-    //       description: selectedChapter?.description,
-    //       uploadDate: new Date().toISOString(),
-    //       publicationDate: new Date().toISOString()
-    //     }
-        
-    //     console.log("updChapter: ");
-    //     console.log(updChapter);
-    //     const result = await axiosInstance.put(`/capitulo/${selectedChapter!._id}`, updChapter);
-    //     console.log(result);
-    //   } else {
-    //     // Añadir usuario
-    //     const newUser = {
-    //       coleccionId: selectedCollection?._id,
-    //       name: selectedChapter?.name,
-    //       hosts: [hosts[0]._id],
-    //       durationInSeconds: 15,
-    //       language: selectedLanguage?._id,
-    //       description: selectedChapter?.description,
-    //       uploadDate: new Date().toISOString(),
-    //       publicationDate: new Date().toISOString()
-    //     }
-    //     await axiosInstance.post('/capitulo', newUser);
-    //   }
-    //   setShowModal(false);
-    //   fetchChapters();
-    // };
   
     return (
       <div>

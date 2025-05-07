@@ -97,45 +97,47 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
         }
     ) {
         //TODO Revisar si se puede hacer una solucion mas simple utilizando la propiedad "touched" de formik.
-        // if (initialData.id) {
-        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        //     const updateFields: any = {};
-        //     updateFields.id = initialData.id;
-        //     if (formData.username != initialData.username) updateFields.username = formData.username;
-        //     if (formData.password != initialData.password) updateFields.password = formData.password;
-        //     if (formData.email != initialData.email) updateFields.email = formData.email;
-        //     if (formData.role != initialData.role?.id) updateFields.role = roles.find((_role) => _role.id == formData.role);
-        //     //Si cambia el tamaño de los arrays o su contenido, actualizo la propiedad "Subscriptions"
-        //     if (formData.subscriptions.length != initialData.subscriptions.length) {
-        //         updateFields.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
-        //     } else {
-        //         //Logica para revisar cambios en el array de "Subscripciones".
-        //         let isDifferent = false;
-        //         for (let i=0; i < formData.subscriptions.length && !isDifferent; i++) {
-        //             //"formData.subscriptions" son las subscripciones que ingresa/modifica el usuario en el modal.
-        //             const formDataScrp = {startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: formData.subscriptions[i].subscription};
-        //             let wasFound = false;
-        //             //Por cada UsuarioSuscripcion de "formData.subscriptions" reviso este contenida en "initialData.subscriptions".
-        //             for (let z=0; z < initialData.subscriptions.length && !wasFound; z++) {
-        //                 //"initialData.subscriptions" son las subscripciones del usuario sin modificar.
-        //                 const initialDataScrp = initialData.subscriptions[z].toAPI();
-        //                 wasFound = initialDataScrp.startDate == formDataScrp.startDate && initialDataScrp.endDate == formDataScrp.endDate && initialDataScrp.subscriptionRef == formDataScrp.subscriptionRef;
-        //             }
-        //             if (!wasFound) isDifferent = true;
-        //         }
-        //         if (isDifferent) updateFields.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
-        //     }
-        //     handleSave(updateFields);
-        // } else {
-        //     const newUser = new User();
-        //     newUser.username = formData.username;
-        //     newUser.password = formData.password;
-        //     newUser.email = formData.email;
-        //     newUser.role = roles.find((_role) => _role.id == formData.role)!;
-        //     newUser.subscriptions = formData.subscriptions.map((_usrScr, i) => new UserSubscription({startDate: formData.subscriptions[i].startDate.toISOString(), endDate: formData.subscriptions[i].endDate.toISOString(), subscriptionRef: {_id: formData.subscriptions[i].subscription, type: subscriptionsTypes.find((_scrp) => _scrp.id == formData.subscriptions[i].subscription)!.type}}));
-        //     handleSave(newUser);
-        // }
-        // handleClose();
+        if (initialData.id) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const updateFields: any = {};
+            updateFields.id = initialData.id;
+            if (formData.name != initialData.name) updateFields.name = formData.name;
+            if (formData.collectionId != initialData.collectionId) updateFields.collectionId = formData.collectionId;
+            if (formData.description != initialData.description) updateFields.description = formData.description;
+            if (formData.publicationDate != initialData.publicationDate) updateFields.publicationDate = formData.publicationDate;
+            if (formData.language != initialData.languageRef?.id) updateFields.languageRef = languages.find(_lang => _lang.id == formData.language)!;
+            //Verifico si es Audiobook o Podcast, utilizando la variable de control del formulario
+            if (isAudiobook) {
+                //Audiobook
+                if (formData.narrator != initialData.getNarrator()?.id) updateFields.narratorRef = narrators.find(_narr => _narr.id == formData.narrator)!;
+                if (formData.authors != initialData.getAuthors()?.map(_auth => _auth.id!)) updateFields.authorsRef = authors.filter(_auth => formData.authors!.includes(_auth.id!));
+            } else {
+                //Podcast
+                if (formData.hosts != initialData.getHosts()?.map(_host => _host.id!)) updateFields.hostsRef = hosts.filter(_host => formData.hosts!.includes(_host.id!));
+            }
+            
+            handleSave(updateFields);
+        } else {
+            const newChapter = new Chapter();
+            newChapter.name = formData.name;
+            newChapter.collectionId = formData.collectionId;
+            //newChapter.durationInSeconds es readonly (0)
+            newChapter.description = formData.description;
+            //newChapter.uploadDate es readonly (misma fecha en la que se ejecuto "new Chapter()")
+            newChapter.publicationDate = formData.publicationDate;
+            newChapter.languageRef = languages.find(_lang => _lang.id == formData.language)!;
+            //Verifico si es audiolibro o podcast segun la variable de control
+            if (isAudiobook) {
+                //Audiobook -> Authors & Narrator
+                newChapter.setNarratorAndAuthors(narrators.find(_narr => _narr.id == formData.narrator)!, authors.filter(_auth => formData.authors!.includes(_auth.id!)));
+            } else {
+                //Podcast -> Hosts
+                newChapter.setHosts(hosts.filter(_host => formData.hosts!.includes(_host.id!)));
+            }
+            
+            handleSave(newChapter);
+        }
+        handleClose();
     }
 
     //Textos para las validaciones.
