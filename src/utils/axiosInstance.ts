@@ -7,7 +7,7 @@ const getAuthToken = (): string | null => {
 
 // Crear una instancia de Axios
 const axiosInstance = axios.create({
-  baseURL: 'https://super-duper-cod-xq9p9jj994jh657w-3005.app.github.dev/api/v0.1/',
+  baseURL: 'http://localhost:3005/api/v0.1/',
 });
 
 // Interceptor para agregar el token a cada solicitud

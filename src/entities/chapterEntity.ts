@@ -28,10 +28,10 @@ export class Chapter {
     public publicationDate: Date;
     public languageRef: Language | null;
     //Podcast -> Hosts
-    private hostsRef: Host[] | null;
+    readonly hostsRef: Host[] | null;
     //Audiolibro -> Authors & Narrator
-    private authorsRef: Author[] | null;
-    private narratorRef: Narrator | null;
+    readonly authorsRef: Author[] | null;
+    readonly narratorRef: Narrator | null;
 
     /**
      * Utilizar unicamente para crear objetos nuevos o de llamadas directas de la clase, para su uso en relaciones/referencias utilizar el metodo de clase **Parse**(data).

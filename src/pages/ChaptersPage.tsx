@@ -26,6 +26,7 @@ const ChaptersPage: React.FC = () => {
         fetchCollections();
         fetchChapters();
       };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchChapters = () => {
@@ -164,29 +165,19 @@ const ChaptersPage: React.FC = () => {
               {chapters.map((chapter) => (
                 <tr key={chapter.id}>
                   <td>{chapter.name}</td>
-                  <td>{collections ? collections.find(collection => collection.id == chapter.collectionId)?.name : "-"}</td>
-                  <td>{chapter.getHosts() && chapter.getHosts()!.length > 0 ? chapter.getHosts()!.map(host => host.name).join("; ") : "Sin conductor"}</td>
-                  {(!chapter.getHosts() || chapter.getHosts()!.length == 0) && (
-                    <>
-                      <td>{chapter.getNarrator()?.name || "Sin narrador"}</td>
-                      <td>
-                        {chapter.getAuthors() && chapter.getAuthors()!.length > 0 
-                          ? chapter.getAuthors()!.map(author => author.name).join("; ") 
-                          : "Sin autores"}
-                      </td>
-                    </>
-                  )}
-                  {(chapter.getHosts() && chapter.getHosts()!.length > 0) && (
-                    <>
-                      <td>{"Sin narrador"}</td>
-                      <td>
-                        {chapter.getHosts() && chapter.getHosts()!.length > 0 
-                          ? "Sin autores" 
-                          : "Sin autores"} 
-                        //ASK ??????????????????????????????????????????????''''
-                      </td>
-                    </>
-                  )}
+                  <td>{collections
+                    ? collections.find(collection => collection.id == chapter.collectionId)?.name
+                    : "-"}
+                  </td>
+                  <td>{chapter.getHosts() && chapter.getHosts()!.length > 0
+                    ? chapter.getHosts()!.map(host => host.name).join("; ")
+                    : "Sin conductor"}
+                  </td>
+                  <td>{chapter.getNarrator()?.name || "Sin narrador"}</td>
+                  <td>{chapter.getAuthors() && chapter.getAuthors()!.length > 0 
+                      ? chapter.getAuthors()!.map(author => author.name).join("; ") 
+                      : "Sin autores"}
+                  </td>
                   <td>{chapter.durationInSeconds}</td>
                   <td>{chapter.languageRef?.name}</td>
                   <td>{chapter.description}</td>
