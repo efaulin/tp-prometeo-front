@@ -31,10 +31,9 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
     const [hosts, setHosts] = useState<Host[]>([]);
     const [collections, setCollections] = useState<Collection[]>([]);
     //Variables de control
-    const [isAudiobook, setIsAudiobook] = useState(true);
+    const [ctrlAudiobook, setCtrlAudiobook] = useState<boolean>();
     
     useEffect(() => {
-        if (initialData.isPodcast()) setIsAudiobook(false);
         fetching();
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData]);
@@ -68,7 +67,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
     }
 
     function handleChangeType(values: any) {
-        if (isAudiobook) {
+        if (ctrlAudiobook == undefined ? initialData.isAudiobook() : ctrlAudiobook) {
             values.authors = undefined;
             values.narrator = "";
             values.hosts = [];
@@ -76,8 +75,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
             values.hosts = undefined;
             values.authors = [];
         }
-
-        setIsAudiobook(!isAudiobook);
+        setCtrlAudiobook(ctrlAudiobook == undefined ? !initialData.isAudiobook() : !ctrlAudiobook);
     }
 
     function handleSubmit(
@@ -107,7 +105,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
             if (formData.publicationDate != initialData.publicationDate) updateFields.publicationDate = formData.publicationDate;
             if (formData.language != initialData.languageRef?.id) updateFields.languageRef = languages.find(_lang => _lang.id == formData.language)!;
             //Verifico si es Audiobook o Podcast, utilizando la variable de control del formulario
-            if (isAudiobook) {
+            if (ctrlAudiobook) {
                 //Audiobook
                 if (formData.narrator != initialData.getNarrator()?.id) updateFields.narratorRef = narrators.find(_narr => _narr.id == formData.narrator)!;
                 if (formData.authors != initialData.getAuthors()?.map(_auth => _auth.id!)) updateFields.authorsRef = authors.filter(_auth => formData.authors!.includes(_auth.id!));
@@ -127,7 +125,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
             newChapter.publicationDate = formData.publicationDate;
             newChapter.languageRef = languages.find(_lang => _lang.id == formData.language)!;
             //Verifico si es audiolibro o podcast segun la variable de control
-            if (isAudiobook) {
+            if (ctrlAudiobook) {
                 //Audiobook -> Authors & Narrator
                 newChapter.setNarratorAndAuthors(narrators.find(_narr => _narr.id == formData.narrator)!, authors.filter(_auth => formData.authors!.includes(_auth.id!)));
             } else {
@@ -137,6 +135,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
             
             handleSave(newChapter);
         }
+        setCtrlAudiobook(undefined);
         handleClose();
     }
 
@@ -144,7 +143,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
     const required = "Valor requerido";
 
     return (
-        <Modal show={show} onHide={() => {handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={show} onHide={() => {setCtrlAudiobook(undefined); handleClose()}} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
                 <Modal.Title>{initialData.id ? 'Editar Capitulo' : 'Agregar Capitulo'}</Modal.Title>
             </Modal.Header>
@@ -229,7 +228,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
                     </div>
 
                     <div className="form-group mb-3">
-                        <FormLabel>Formato: <strong>{isAudiobook ? "AudioLibro" : "Podcast"}</strong></FormLabel>
+                        <FormLabel>Formato: <strong>{ctrlAudiobook == true || (ctrlAudiobook == undefined && initialData.isAudiobook()) ? "Audiolibro" : "Podcast"}</strong></FormLabel>
                         <button className='btn btn-sm btn-secondary ms-1'
                         type='button'
                         onClick={() => handleChangeType(values)}
@@ -239,7 +238,7 @@ export const ChapterDataModal : React.FC<EditModalProps> = ({show, handleClose, 
                     </div>
                     
                     <div className='form-group border border-dark mb-3 p-2'>
-                        {isAudiobook ? //Si es Audiolibro
+                        {ctrlAudiobook == true || (ctrlAudiobook == undefined && initialData.isAudiobook()) ? //Si es Audiolibro
                         <>
                             {/* //TODO UI/UX Estaria bueno que se pueda ir ingresando texto para filtrar, ya que en un plan ideal habria muchisimas collecciones como para mostrarlas en una lista. */}
                             <div className="form-group mb-3">

@@ -49,7 +49,7 @@ export class Chapter {
 
             //Podcast -> Hosts
             //Audiolibro -> Authors & Narrator
-            if (chapter.hostsRef.length > 0) {
+            if (chapter.hostsRef && chapter.hostsRef.length > 0) {
                 const tmpHosts:Host[] = [];
                 chapter.hostsRef.forEach((hst) => {
                     const tmp = Host.Parse(hst);
